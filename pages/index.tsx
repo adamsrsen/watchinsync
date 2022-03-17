@@ -19,8 +19,8 @@ export default class Home extends Component {
           <title>Home - WatchInSync</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <Header user={this.props.user} />
 
+        <Header user={this.props.user} />
         <CenteredContent>
           {this.props.user ? (
             <>

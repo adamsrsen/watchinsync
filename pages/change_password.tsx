@@ -1,13 +1,13 @@
 import {Component} from 'react'
 import Head from 'next/head'
-import Link from 'next/link'
 import Header from '../components/Header'
-import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import User from '../objects/User'
+import Divider from '../components/Divider'
 
-export default class SignIn extends Component {
+export default class ChangePassword extends Component {
   props: {
     user: User
   }
@@ -16,18 +16,18 @@ export default class SignIn extends Component {
     return (
       <div>
         <Head>
-          <title>Sign in - WatchInSync</title>
+          <title>Change password - WatchInSync</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="text" placeholder="Email" />
-          <Input type="password" placeholder="Password" />
+          <Input type="password" placeholder="Current password" />
+          <Input type="password" placeholder="New password" />
+          <Input type="password" placeholder="Repeat password" />
           <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
-            <b>SIGN IN</b>
+            <b>CHANGE PASSWORD</b>
           </Button>
-          <p>Don't you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
         </CenteredContent>
       </div>
     )

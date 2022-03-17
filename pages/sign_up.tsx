@@ -20,17 +20,15 @@ export default class SignUp extends Component {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header  user={this.props.user}/>
-        <CenteredContent>
-          <form className="form">
-            <Input type="text" placeholder="Username" />
-            <Input type="text" placeholder="Email" />
-            <Input type="password" placeholder="Password" />
-            <Input type="password" placeholder="Repeat password" />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
-              <b>SIGN UP</b>
-            </Button>
-          </form>
+        <Header user={this.props.user}/>
+        <CenteredContent width={600}>
+          <Input type="text" placeholder="Username" />
+          <Input type="text" placeholder="Email" />
+          <Input type="password" placeholder="Password" />
+          <Input type="password" placeholder="Repeat password" />
+          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <b>SIGN UP</b>
+          </Button>
           <p>Do you already have account? <Link href="/sign_in"><a className="link">Sign in</a></Link></p>
         </CenteredContent>
       </div>
