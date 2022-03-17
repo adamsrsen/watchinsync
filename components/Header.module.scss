@@ -1,0 +1,39 @@
+@import "styles/constants";
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $dark-secondary;
+  padding: 0 2rem;
+
+  h1 {
+    font-size: 5rem;
+  }
+
+  .header-text {
+    font-size: 2rem;
+  }
+
+  .header-link {
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+
+    &.header-text {
+      transition: color .15s ease-in;
+
+      &:hover {
+        color: $light-secondary;
+      }
+    }
+  }
+
+  .header-group {
+    display: flex;
+
+    * {
+      margin: 1rem;
+    }
+  }
+}

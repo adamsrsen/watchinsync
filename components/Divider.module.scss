@@ -1,0 +1,8 @@
+@import "./styles/constants";
+
+.divider {
+  display: block;
+  width: 90%;
+  border: $grey solid 1px;
+  margin: 2rem auto;
+}

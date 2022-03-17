@@ -1,14 +1,37 @@
+import {Component} from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
+import Header from '../components/Header'
+import User from '../objects/User'
+import CenteredContent from '../components/CenteredContent'
+import Input from '../components/Input'
+import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 
-export default function Home() {
-  return (
-    <div>
-      <Head>
-        <title>Sign in - WatchInSync</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export default class SignIn extends Component {
+  props: {
+    user: User
+  }
 
-      Sign in
-    </div>
-  )
+  render() {
+    return (
+      <div>
+        <Head>
+          <title>Sign in - WatchInSync</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+
+        <Header  user={this.props.user}/>
+        <CenteredContent>
+          <form className="form">
+            <Input type="text" placeholder="Email" />
+            <Input type="password" placeholder="Password" />
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+              <b>SIGN IN</b>
+            </Button>
+          </form>
+          <p>Don't you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
+        </CenteredContent>
+      </div>
+    )
+  }
 }

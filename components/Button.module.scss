@@ -1,0 +1,32 @@
+@import "./styles/constants";
+
+.button {
+  color: $light-primary;
+  background-color: $color-primary;
+  border: none;
+  margin: 1rem 0;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s ease-in;
+
+  &:hover {
+    background-color: $color-secondary;
+    color: $light-secondary;
+  }
+
+  &.button-small {
+    padding: 1rem;
+    border-radius: 1rem;
+    font-size: 1.5rem;
+  }
+
+  &.button-large {
+    padding: 2rem;
+    border-radius: 2rem;
+    font-size: 3rem;
+  }
+
+  &.button-fullwidth {
+    width: 100%;
+  }
+}
