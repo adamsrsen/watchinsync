@@ -1,16 +1,15 @@
 import {Component} from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import Header from '../../../components/Header'
-import User from '../../../objects/User'
-import Container from '../../../components/Container'
-import List from '../../../components/List'
-import Item from '../../../components/Item'
-import Button, {ButtonSize, ButtonWidth} from '../../../components/Button'
-import styles from '../../../styles/Room.module.scss'
-import Input from '../../../components/Input'
+import Header from '../../components/Header'
+import User from '../../objects/User'
+import Container from '../../components/Container'
+import List from '../../components/List'
+import Item from '../../components/Item'
+import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
+import styles from '../../styles/Room.module.scss'
 
-export default class Rooms extends Component {
+export default class MyRooms extends Component {
   props: {
     user: User
     rooms: [{
@@ -30,7 +29,6 @@ export default class Rooms extends Component {
         <Header user={this.props.user} />
         <Container>
           <h2 className="title">Browse rooms</h2>
-          <Input type="text" placeholder="Search..." />
           <List>
             {this.props.rooms?.map((room) => (
               <Item key={room.id}>
@@ -44,7 +42,7 @@ export default class Rooms extends Component {
             )) || (
               <Item>
                 <p className="center">
-                  There are no public rooms, so <Link href="/sign_up"><a className="link">sign up</a></Link> and create one
+                  You haven't joined any rooms yet, <Link href="/rooms/page/1"><a className="link">browse public rooms</a></Link> or <Link href="/room/create"><a className="link">create one</a></Link>
                 </p>
               </Item>
             )}
@@ -52,36 +50,5 @@ export default class Rooms extends Component {
         </Container>
       </div>
     )
-  }
-}
-
-
-export async function getStaticPaths() {
-  return {
-    paths: [
-      {
-        params: {
-          page: ':page'
-        }
-      }
-    ],
-    fallback: true
-  }
-}
-
-export async function getStaticProps({params}) {
-  return {
-    props: {
-      rooms: [
-        {
-          id: '1',
-          name: 'test1'
-        },
-        {
-          id: '2',
-          name: 'test2'
-        }
-      ]
-    }
   }
 }

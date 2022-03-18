@@ -34,9 +34,17 @@ export default class Home extends Component {
               If you want to create your own rooms <Link href="/sign_up"><a className="link">sign up</a></Link>
             </p>
           )}
-          <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms">
+          <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/page/1">
             <b>BROWSE ROOMS</b>
           </Button>
+          {this.props.user && (
+            <>
+              <Divider />
+              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/my">
+                <b>MY ROOMS</b>
+              </Button>
+            </>
+          )}
         </CenteredContent>
       </div>
     )

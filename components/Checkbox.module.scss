@@ -1,0 +1,40 @@
+@import "./styles/constants";
+
+.checkbox {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 2rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  cursor: pointer;
+  user-select: none;
+
+  .checkbox-check {
+    display: block;
+    background-color: $dark-secondary;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: .5rem;
+
+    &.checked {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: $color-primary;
+
+      &::before {
+        content: "";
+        width: .5rem;
+        height: 1rem;
+        border-bottom: solid $light-primary .25rem;
+        border-right: solid $light-primary .25rem;
+        transform: rotate(45deg) translate(-.125rem, -.125rem);
+      }
+    }
+  }
+
+  input {
+    display: none;
+  }
+}

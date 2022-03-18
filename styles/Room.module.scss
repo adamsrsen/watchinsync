@@ -1,0 +1,19 @@
+@import "./styles/constants";
+
+.room {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all .15s ease-in;
+
+  span {
+    font-size: 2rem;
+  }
+
+  &:hover {
+    background-color: $dark-secondary;
+  }
+}
