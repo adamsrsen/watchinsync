@@ -7,7 +7,7 @@ import Container from '../../../components/Container'
 import List from '../../../components/List'
 import Item from '../../../components/Item'
 import Button, {ButtonSize, ButtonWidth} from '../../../components/Button'
-import styles from '../../../styles/Room.module.scss'
+import styles from '../../../styles/Rooms.module.scss'
 import Input from '../../../components/Input'
 
 export default class Rooms extends Component {

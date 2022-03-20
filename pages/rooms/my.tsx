@@ -7,7 +7,7 @@ import Container from '../../components/Container'
 import List from '../../components/List'
 import Item from '../../components/Item'
 import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
-import styles from '../../styles/Room.module.scss'
+import styles from '../../styles/Rooms.module.scss'
 
 export default class MyRooms extends Component {
   props: {
@@ -42,7 +42,7 @@ export default class MyRooms extends Component {
             )) || (
               <Item>
                 <p className="center">
-                  You haven't joined any rooms yet, <Link href="/rooms/page/1"><a className="link">browse public rooms</a></Link> or <Link href="/room/create"><a className="link">create one</a></Link>
+                  You haven&#39;t joined any rooms yet, <Link href="/rooms/page/1"><a className="link">browse public rooms</a></Link> or <Link href="/room/create"><a className="link">create one</a></Link>
                 </p>
               </Item>
             )}

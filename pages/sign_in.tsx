@@ -27,7 +27,7 @@ export default class SignIn extends Component {
           <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
             <b>SIGN IN</b>
           </Button>
-          <p>Don't you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
+          <p>Don&#39;t you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
         </CenteredContent>
       </div>
     )

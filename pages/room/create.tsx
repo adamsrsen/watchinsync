@@ -3,8 +3,6 @@ import Head from 'next/head'
 import Header from '../../components/Header'
 import CenteredContent from '../../components/CenteredContent'
 import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
-import Divider from '../../components/Divider'
-import Link from 'next/link'
 import User from '../../objects/User'
 import Input from '../../components/Input'
 import Checkbox from '../../components/Checkbox'
@@ -23,7 +21,7 @@ export default class CreateRoom extends Component {
     return (
       <div>
         <Head>
-          <title>Home - WatchInSync</title>
+          <title>Create room - WatchInSync</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
 

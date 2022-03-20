@@ -15,7 +15,7 @@ export default class Header extends Component {
         <Link href="/">
           <a className={[styles['header-link'], styles['header-group']].join(' ')}>
             <div>
-              <Image src="/watchinsync.png" width={100} height={100}/>
+              <Image src="/watchinsync.png" alt="WatchInSync logo" width={100} height={100}/>
             </div>
             <h1>WatchInSync</h1>
           </a>

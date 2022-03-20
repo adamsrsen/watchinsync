@@ -1,0 +1,21 @@
+@import "./styles/constants";
+
+.video {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+
+  &:hover {
+    color: $light-secondary;
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+
+    & > * {
+      margin-right: 1rem !important;
+    }
+  }
+}

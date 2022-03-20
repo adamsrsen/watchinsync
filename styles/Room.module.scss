@@ -1,19 +1,11 @@
-@import "./styles/constants";
-
-.room {
+.content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  border-radius: 1rem;
-  overflow: hidden;
-  transition: all .15s ease-in;
+  height: calc(100vh - 54px - 2rem);
 
-  span {
-    font-size: 2rem;
-  }
-
-  &:hover {
-    background-color: $dark-secondary;
+  .player-container {
+    width: calc(100vw - 41rem);
+    height: calc((100vw - 41rem) * 9 / 16);
+    margin: 3rem;
   }
 }
