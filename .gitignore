@@ -36,3 +36,7 @@ yarn-error.log*
 
 # JetBrains
 .idea
+
+# temporary
+tmp/
+temp/
