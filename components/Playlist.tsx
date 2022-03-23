@@ -4,9 +4,13 @@ import List from './List'
 import Video from '../objects/Video'
 import Item from './Item'
 import styles from './Playlist.module.scss'
-import Dropdown from './Dropdown'
+import Room from '../objects/Room'
 
-export default class Playlist extends Component {
+interface Props {
+  room: Room
+}
+
+export default class Playlist extends Component<Props> {
   state: {
     videos: Video[]
   }

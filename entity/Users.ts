@@ -1,8 +1,8 @@
 import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
-import Role from './Role'
+import Roles from './Roles'
 
 @Entity()
-export default class User extends BaseEntity {
+export default class Users extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -15,6 +15,6 @@ export default class User extends BaseEntity {
   @Column()
   password: string
 
-  @OneToMany(() => Role, (role) => role.user)
-  joined_rooms: Role[]
+  @OneToMany(() => Roles, (role) => role.user)
+  joined_rooms: Partial<Roles[]>
 }

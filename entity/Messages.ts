@@ -1,9 +1,9 @@
 import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp} from 'typeorm'
-import User from './User'
-import Room from './Room'
+import Users from './Users'
+import Rooms from './Rooms'
 
 @Entity()
-export default class Message extends BaseEntity {
+export default class Messages extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -13,9 +13,9 @@ export default class Message extends BaseEntity {
   @Column({type: 'timestamp'})
   timestamp: Timestamp
 
-  @ManyToOne(() => User)
-  user: User
+  @ManyToOne(() => Users)
+  user: Partial<Users>
 
-  @ManyToOne(() => Room, (room) => room.messages)
-  room: Room
+  @ManyToOne(() => Rooms, (room) => room.messages)
+  room: Partial<Rooms>
 }

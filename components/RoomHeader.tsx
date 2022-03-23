@@ -4,11 +4,11 @@ import Image from 'next/image'
 import styles from './RoomHeader.module.scss'
 import Room from '../objects/Room'
 
-export default class RoomHeader extends Component {
-  props: {
-    room: Room
-  }
+interface Props {
+  room?: Room
+}
 
+export default class RoomHeader extends Component<Props> {
   render() {
     return (
       <div className={styles.header}>
@@ -21,10 +21,10 @@ export default class RoomHeader extends Component {
               </div>
             </a>
           </Link>
-          <h1>{this.props.room.name}</h1>
+          <h1>{this.props.room?.name}</h1>
         </div>
         <div className={[styles['header-group'], styles['header-input']].join(' ')}>
-          <input placeholder="Video url (https://example.com/video.mp4)" />
+          <input placeholder="Videos url (https://example.com/video.mp4)" />
           <button>Add</button>
         </div>
         <div className={styles['header-group']}>

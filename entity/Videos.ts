@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
-import User from './User'
-import Room from './Room'
+import Users from './Users'
+import Rooms from './Rooms'
 
 export enum VideoType {
   YOUTUBE = 'youtube',
@@ -11,7 +11,7 @@ export enum VideoType {
 }
 
 @Entity()
-export default class Video extends BaseEntity {
+export default class Videos extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -27,9 +27,9 @@ export default class Video extends BaseEntity {
   @Column()
   played: boolean
 
-  @ManyToOne(() => User)
-  user: User
+  @ManyToOne(() => Users)
+  user: Partial<Users>
 
-  @ManyToOne(() => Room, (room) => room.videos)
-  room: Room
+  @ManyToOne(() => Rooms, (room) => room.videos)
+  room: Partial<Rooms>
 }
