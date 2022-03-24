@@ -1,9 +1,9 @@
-import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp} from 'typeorm'
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp} from 'typeorm'
 import Users from './Users'
 import Rooms from './Rooms'
 
 @Entity()
-export default class Messages extends BaseEntity {
+export default class Messages {
   @PrimaryGeneratedColumn()
   id: number
 

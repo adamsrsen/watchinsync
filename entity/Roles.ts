@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, ManyToOne} from 'typeorm'
+import {Column, Entity, ManyToOne} from 'typeorm'
 import Users from './Users'
 import Rooms from './Rooms'
 
@@ -9,7 +9,7 @@ export enum UserRole {
 }
 
 @Entity()
-export default class Roles extends BaseEntity {
+export default class Roles {
   @ManyToOne(() => Users, (user) => user.joined_rooms, {primary: true})
   user: Partial<Users>
 

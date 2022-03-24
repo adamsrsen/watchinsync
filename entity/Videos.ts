@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
 import Users from './Users'
 import Rooms from './Rooms'
 
@@ -11,7 +11,7 @@ export enum VideoType {
 }
 
 @Entity()
-export default class Videos extends BaseEntity {
+export default class Videos {
   @PrimaryGeneratedColumn()
   id: number
 

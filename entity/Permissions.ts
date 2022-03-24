@@ -1,7 +1,7 @@
-import {BaseEntity, Column, Entity, PrimaryColumn} from 'typeorm'
+import {Column, Entity, PrimaryColumn} from 'typeorm'
 
 @Entity()
-export default class Permissions extends BaseEntity {
+export default class Permissions {
   @PrimaryColumn()
   id: number
 
