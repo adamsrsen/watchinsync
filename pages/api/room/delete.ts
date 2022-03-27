@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .from<Rooms>('Rooms')
         .where('id = :roomId', {roomId})
         .execute()
-      res.send('')
+      res.end()
     }
     catch(e) {
       console.log(e)

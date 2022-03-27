@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const playlist = await connection
       .getRepository<Videos>('Videos')
       .createQueryBuilder('video')
-      .select(['video.id', 'video.type', 'video.link'])
+      .select(['video.id', 'video.type', 'video.link', 'video.name'])
       .where('video.room.id = :roomId AND video.played = :played', {played: false, roomId})
       .orderBy('position', 'ASC')
       .getMany()

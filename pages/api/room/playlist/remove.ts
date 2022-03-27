@@ -1,11 +1,12 @@
-import {NextApiRequest, NextApiResponse} from 'next'
+import {NextApiRequest} from 'next'
 import bodyParser from 'body-parser'
 import {promisify} from 'util'
 import getConnection from '../../../../lib/db'
 import Videos from '../../../../entity/Videos'
 import {decodeRoomId} from '../../../../lib/util'
+import {NextApiResponseSocketIO} from '../../../../objects/NextApiResponseSocketIO'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponseSocketIO) {
   if(req.method === 'POST') {
     await promisify(bodyParser.urlencoded())(req,res)
 
@@ -25,7 +26,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .from<Videos>('Videos')
         .where('id = :videoId AND room.id = :roomId', {videoId: req.body?.videoId, roomId})
         .execute()
-      res.send('')
+
+      res.socket.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
+
+      res.end()
     }
     catch(e) {
       res.status(400).send('database error')

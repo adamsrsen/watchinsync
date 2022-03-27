@@ -13,13 +13,42 @@ import getConnection from '../../../lib/db'
 import Rooms from '../../../entity/Rooms'
 import Room from '../../../objects/Room'
 import {encode} from 'uuid-base64-ts'
+import {NextRouter, withRouter} from 'next/router'
 
 interface Props {
   user: User
   rooms: Room[]
+  router: NextRouter
 }
 
-export default class RoomsPage extends Component<Props> {
+class RoomsPage extends Component<Props> {
+  renderRoomList() {
+    if(this.props.router.isFallback) {
+      return <h2>Loading...</h2>
+    }
+
+    return (
+      <List>
+        {this.props.rooms?.map((room) => (
+          <Item key={room.id}>
+            <div className={styles.room}>
+              <span>{room.name}</span>
+              <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${encodeURIComponent(room.id)}`}>
+                <b>JOIN</b>
+              </Button>
+            </div>
+          </Item>
+        )) || (
+          <Item>
+            <p className="center">
+              There are no public rooms, so <Link href="/sign_up"><a className="link">sign up</a></Link> and create one
+            </p>
+          </Item>
+        )}
+      </List>
+    )
+  }
+
   render() {
     return (
       <div>
@@ -32,30 +61,14 @@ export default class RoomsPage extends Component<Props> {
         <Container>
           <h2 className="title">Browse rooms</h2>
           <Input type="text" placeholder="Search..." />
-          <List>
-            {this.props.rooms?.map((room) => (
-              <Item key={room.id}>
-                <div className={styles.room}>
-                  <span>{room.name}</span>
-                  <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${encodeURIComponent(room.id)}`}>
-                    <b>JOIN</b>
-                  </Button>
-                </div>
-              </Item>
-            )) || (
-              <Item>
-                <p className="center">
-                  There are no public rooms, so <Link href="/sign_up"><a className="link">sign up</a></Link> and create one
-                </p>
-              </Item>
-            )}
-          </List>
+          {this.renderRoomList()}
         </Container>
       </div>
     )
   }
 }
 
+export default withRouter(RoomsPage)
 
 export async function getStaticPaths() {
   return {

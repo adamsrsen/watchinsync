@@ -1,6 +1,7 @@
 import {Component} from 'react'
 import Head from 'next/head'
 import {NextRouter, withRouter} from 'next/router'
+import io, {Socket} from 'socket.io-client'
 import RoomHeader from '../../components/RoomHeader'
 import Room from '../../objects/Room'
 import Player from '../../components/players/Player'
@@ -13,6 +14,7 @@ import Chat from '../../components/Chat'
 import styles from '../../styles/Room.module.scss'
 import Video from '../../objects/Video'
 import {decodeRoomId} from '../../lib/util'
+import axios from 'axios'
 
 interface Props {
   room: Room
@@ -24,6 +26,7 @@ class RoomPage extends Component<Props> {
   state: {
     playlist?: Video[]
   }
+  socket: Socket
 
   constructor(props) {
     super(props)
@@ -31,6 +34,16 @@ class RoomPage extends Component<Props> {
     this.state = {
       playlist: this.props.playlist
     }
+
+    this.socket = io({path: '/api/socketio'})
+    this.socket.on('connect', () => {
+      this.socket.emit('join', this.props.room.id)
+    })
+    this.socket.on('update_playlist', () => {
+      axios.get(`/api/room/playlist?roomId=${this.props.room.id}`).then((res) => {
+        this.setState({playlist: res.data})
+      }).catch((e) => {})
+    })
   }
 
   render() {
