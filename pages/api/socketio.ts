@@ -18,8 +18,20 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
 
     io.on('connection', (socket) => {
       socket.on('join', (roomId) => {
-        console.log('joined room ' + roomId)
         socket.join(roomId)
+        io.in(roomId).emit('pause')
+
+        socket.on('play', (time) => {
+          io.in(roomId).emit('seek', time)
+          io.in(roomId).emit('play')
+        })
+        socket.on('pause', (time) => {
+          io.in(roomId).emit('seek', time)
+          io.in(roomId).emit('pause')
+        })
+        socket.on('seek', (time) => {
+          io.in(roomId).emit('seek', time)
+        })
       })
     })
   }

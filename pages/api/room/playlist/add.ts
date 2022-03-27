@@ -27,7 +27,7 @@ const getType = (link) => {
     return [VideoType.FACEBOOK, match[3], match[3]]
   }
 
-  match = link.match(/^((?:https?:)?\/\/)(([-a-zA-Z0-9@:%_\+~#=]{2,63}\.)+[a-z]{2,6})\b(\/[-a-zA-Z0-9@:%_\+.~#?&=]*)*\/([-a-zA-Z0-9@:%_\+.~#?&=]+(.mp4|.webm))$/)
+  match = link.match(/^((?:https?:)?\/\/)(([-a-zA-Z0-9@:%_\+~#=]{1,63}\.)+[a-z]{2,6})\b(\/[-a-zA-Z0-9@:%_\+.~#?&=]+)*\/([-a-zA-Z0-9@:%_\+.~#?&=]+(\.mp4|\.webm))$/)
   if(match) {
     return [VideoType.DIRECT, link, match[5]]
   }

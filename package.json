@@ -21,7 +21,8 @@
       "socket.io-client": "^4.4.1",
       "typeorm": "0.2.45",
       "uuid": "^8.3.2",
-      "uuid-base64-ts": "^1.0.2"
+      "uuid-base64-ts": "^1.0.2",
+      "video.js": "^7.18.1"
    },
    "devDependencies": {
       "@types/node": "^16.11.10",

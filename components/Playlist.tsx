@@ -29,9 +29,7 @@ export default class Playlist extends Component<Props> {
                   {
                     title: 'Remove',
                     onClick: () => {
-                      axios.post('/api/room/playlist/remove', {roomId: this.props.room.id, videoId: video.id}).then(() => {
-                        console.log('removed')
-                      }).catch((e) => {})
+                      axios.post('/api/room/playlist/remove', {roomId: this.props.room.id, videoId: video.id}).then(() => {}).catch((e) => {})
                     }
                   }
                 ]}>

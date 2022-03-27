@@ -1,4 +1,4 @@
-import {Component} from 'react'
+import {Component, createRef, lazy, RefObject} from 'react'
 import Head from 'next/head'
 import {NextRouter, withRouter} from 'next/router'
 import io, {Socket} from 'socket.io-client'
@@ -15,6 +15,16 @@ import styles from '../../styles/Room.module.scss'
 import Video from '../../objects/Video'
 import {decodeRoomId} from '../../lib/util'
 import axios from 'axios'
+import VideoJS from '../../components/players/VideoJS'
+
+const players = {
+  '': Player,
+  'direct': VideoJS,
+  'youtube': Player,
+  'vimeo': Player,
+  'twitch': Player,
+  'facebook': Player
+}
 
 interface Props {
   room: Room
@@ -27,6 +37,7 @@ class RoomPage extends Component<Props> {
     playlist?: Video[]
   }
   socket: Socket
+  player: RefObject<any>
 
   constructor(props) {
     super(props)
@@ -36,14 +47,14 @@ class RoomPage extends Component<Props> {
     }
 
     this.socket = io({path: '/api/socketio'})
-    this.socket.on('connect', () => {
-      this.socket.emit('join', this.props.room.id)
-    })
     this.socket.on('update_playlist', () => {
       axios.get(`/api/room/playlist?roomId=${this.props.room.id}`).then((res) => {
         this.setState({playlist: res.data})
       }).catch((e) => {})
     })
+    this.socket.emit('join', this.props.room.id)
+
+    this.player = createRef()
   }
 
   render() {
@@ -63,6 +74,8 @@ class RoomPage extends Component<Props> {
       )
     }
 
+    const VideoPlayer = players[this.state.playlist[0]?.type || '']
+
     return (
       <div>
         <Head>
@@ -73,7 +86,7 @@ class RoomPage extends Component<Props> {
         <RoomHeader room={this.props.room} />
         <div className={styles.content}>
           <div className={styles['player-container']}>
-            <Player />
+            <VideoPlayer ref={this.player} link={this.state.playlist[0]?.link} socket={this.socket} />
           </div>
           <div className={styles.sidebar}>
             <Tabs tabs={[

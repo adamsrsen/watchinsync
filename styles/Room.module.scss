@@ -6,9 +6,9 @@
   height: calc(100vh - 54px - 2rem);
 
   .player-container {
-    width: calc(100vw - 41rem);
-    height: calc((100vw - 41rem) * 9 / 16);
-    margin: 3rem;
+    display: flex;
+    justify-content: center;
+    width: calc(100vw - 35rem);
   }
 }
 
