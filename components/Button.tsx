@@ -1,4 +1,4 @@
-import {Component, ReactNode} from 'react'
+import {Component, MouseEventHandler, ReactNode} from 'react'
 import Link from 'next/link'
 import styles from './Button.module.scss'
 
@@ -14,14 +14,14 @@ export const ButtonWidth = {
   fullwidth: styles['button-fullwidth'],
 } as const
 
-export default class Button extends Component {
-  props: {
-    size: ButtonSize,
-    width: ButtonWidth,
-    href?: string,
-    children: ReactNode
-  }
+interface Props {
+  size: ButtonSize,
+  width: ButtonWidth,
+  href?: string,
+  onClick?: MouseEventHandler<HTMLButtonElement>
+}
 
+export default class Button extends Component<Props> {
   render() {
     return this.props.href ? (
       <Link href={this.props.href}>
@@ -30,7 +30,7 @@ export default class Button extends Component {
         </a>
       </Link>
     ) : (
-      <button className={[styles.button, this.props.size, this.props.width].join(' ')}>
+      <button className={[styles.button, this.props.size, this.props.width].join(' ')} onClick={this.props.onClick}>
         {this.props.children}
       </button>
     )

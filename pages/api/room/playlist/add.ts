@@ -1,0 +1,80 @@
+import {NextApiRequest, NextApiResponse} from 'next'
+import bodyParser from 'body-parser'
+import {promisify} from 'util'
+import getConnection from '../../../../lib/db'
+import Videos, {VideoType} from '../../../../entity/Videos'
+import {decodeRoomId} from '../../../../lib/util'
+
+const getType = (link) => {
+  let match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?(?:youtube(-nocookie)?\.com|youtu.be)(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/)
+  if(match) {
+    return [VideoType.YOUTUBE, match[5], match[5]]
+  }
+
+  match = link.match(/^((?:https?:)?\/\/)?(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)$/)
+  if(match) {
+    return [VideoType.VIMEO, match[4], match[4]]
+  }
+
+  match = link.match(/^((?:https?:)?\/\/)?((?:www|m|clips)\.)?(twitch\.tv)\/(?:videos\/|\w+\/clip\/|)([\w\-]+)$/)
+  if(match) {
+    return [VideoType.TWITCH, match[4], match[4]]
+  }
+
+  match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?facebook\.com\/(?:.*?\/videos\/(\d+))$/)
+  if(match) {
+    return [VideoType.FACEBOOK, match[3], match[3]]
+  }
+
+  match = link.match(/^((?:https?:)?\/\/)(([-a-zA-Z0-9@:%_\+~#=]{2,63}\.)+[a-z]{2,6})\b(\/[-a-zA-Z0-9@:%_\+.~#?&=]*)*\/([-a-zA-Z0-9@:%_\+.~#?&=]+(.mp4|.webm))$/)
+  if(match) {
+    return [VideoType.DIRECT, link, match[5]]
+  }
+
+  return []
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if(req.method === 'POST') {
+    await promisify(bodyParser.urlencoded())(req,res)
+
+    let roomId
+    try {
+      roomId = decodeRoomId(req.body?.roomId.toString())
+    }
+    catch(e) {
+      return res.status(400).send('roomId has invalid format')
+    }
+
+    const [type, link, name] = getType(req.body?.link)
+    if(!type) {
+      return res.status(400).send('link has invalid format')
+    }
+
+    const connection = await getConnection()
+    try {
+      await connection
+        .createQueryBuilder()
+        .insert()
+        .into<Videos>('Videos')
+        .values({
+          type,
+          link,
+          name,
+          position: 1,
+          played: false,
+          room: {
+            id: roomId
+          }
+        })
+        .execute()
+      res.send('')
+    }
+    catch(e) {
+      res.status(400).send('database error')
+    }
+  }
+  else {
+    res.status(404).send('')
+  }
+}

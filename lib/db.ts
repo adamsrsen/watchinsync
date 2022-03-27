@@ -1,5 +1,6 @@
+import 'ts-node/register'
 import 'reflect-metadata'
-import {Connection, ConnectionOptions, createConnection, getConnectionManager} from 'typeorm'
+import {ConnectionOptions, getConnectionManager} from 'typeorm'
 import * as db_options from '../ormconfig.json'
 import Messages from '../entity/Messages'
 import Permissions from '../entity/Permissions'

@@ -21,6 +21,9 @@ export default class Videos {
   @Column()
   link: string
 
+  @Column()
+  name: string
+
   @Column({type: 'integer'})
   position: number
 
@@ -30,6 +33,6 @@ export default class Videos {
   @ManyToOne(() => Users)
   user: Partial<Users>
 
-  @ManyToOne(() => Rooms, (room) => room.videos)
+  @ManyToOne(() => Rooms, (room) => room.videos, {onDelete: 'CASCADE'})
   room: Partial<Rooms>
 }

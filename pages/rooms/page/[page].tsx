@@ -9,16 +9,17 @@ import Item from '../../../components/Item'
 import Button, {ButtonSize, ButtonWidth} from '../../../components/Button'
 import styles from '../../../styles/Rooms.module.scss'
 import Input from '../../../components/Input'
+import getConnection from '../../../lib/db'
+import Rooms from '../../../entity/Rooms'
+import Room from '../../../objects/Room'
+import {encode} from 'uuid-base64-ts'
 
-export default class Rooms extends Component {
-  props: {
-    user: User
-    rooms: [{
-      id: string
-      name: string
-    }]
-  }
+interface Props {
+  user: User
+  rooms: Room[]
+}
 
+export default class RoomsPage extends Component<Props> {
   render() {
     return (
       <div>
@@ -36,7 +37,7 @@ export default class Rooms extends Component {
               <Item key={room.id}>
                 <div className={styles.room}>
                   <span>{room.name}</span>
-                  <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${room.id}`}>
+                  <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${encodeURIComponent(room.id)}`}>
                     <b>JOIN</b>
                   </Button>
                 </div>
@@ -70,18 +71,25 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({params}) {
+  const {page} = params
+
+  const connection = await getConnection()
+  const rooms = await connection
+    .getRepository<Rooms>('Rooms')
+    .createQueryBuilder('room')
+    .select(['room.id', 'room.name'])
+    .where('room.public = :public', {public: true})
+    .orderBy('room.name', 'ASC')
+    .limit(25)
+    .offset((page - 1) * 25)
+    .getMany()
+
   return {
     props: {
-      rooms: [
-        {
-          id: '1',
-          name: 'test1'
-        },
-        {
-          id: '2',
-          name: 'test2'
-        }
-      ]
+      rooms: rooms.map((room) => ({
+        id: encode(room.id),
+        name: room.name
+      }))
     }
   }
 }

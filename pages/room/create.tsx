@@ -1,23 +1,32 @@
 import {Component} from 'react'
 import Head from 'next/head'
+import {NextRouter, withRouter} from 'next/router'
 import Header from '../../components/Header'
 import CenteredContent from '../../components/CenteredContent'
 import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
 import User from '../../objects/User'
 import Input from '../../components/Input'
 import Checkbox from '../../components/Checkbox'
+import axios from 'axios'
 
-export default class CreateRoom extends Component {
-  props: {
-    user: User
+interface Props {
+  user: User
+  router: NextRouter
+}
+
+class CreateRoom extends Component<Props> {
+  state = {
+    public: false,
+    name: ''
   }
 
-  state = {
-    public: false
+  createRoom() {
+    axios.post('/api/room/create', {...this.state}).then((res) => {
+      this.props.router.push(`/room/${encodeURIComponent(res.data.id)}`)
+    })
   }
 
   render() {
-    console.log(this.state)
     return (
       <div>
         <Head>
@@ -27,11 +36,11 @@ export default class CreateRoom extends Component {
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="text" placeholder="Name" />
+          <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
           <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
             Public
           </Checkbox>
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} onClick={() => this.createRoom()}>
             <b>CREATE ROOM</b>
           </Button>
         </CenteredContent>
@@ -39,3 +48,5 @@ export default class CreateRoom extends Component {
     )
   }
 }
+
+export default withRouter(CreateRoom)
