@@ -2,13 +2,14 @@
 
 .content {
   display: flex;
-  align-items: center;
   height: calc(100vh - 54px - 2rem);
 
   .player-container {
     display: flex;
+    align-items: center;
     justify-content: center;
     width: calc(100vw - 35rem);
+    height: 100%;
   }
 }
 

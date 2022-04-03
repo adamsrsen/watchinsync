@@ -5,11 +5,13 @@ import getConnection from '../../../../lib/db'
 import Videos, {VideoType} from '../../../../entity/Videos'
 import {decodeRoomId} from '../../../../lib/util'
 import {NextApiResponseSocketIO} from '../../../../objects/NextApiResponseSocketIO'
+import axios from 'axios'
 
-const getType = (link) => {
+const getType = async (link) => {
   let match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?(?:youtube(-nocookie)?\.com|youtu.be)(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/)
   if(match) {
-    return [VideoType.YOUTUBE, match[5], match[5]]
+    const name = (await axios.get(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${match[5]}`)}`)).data?.title
+    return [VideoType.YOUTUBE, match[5], name]
   }
 
   match = link.match(/^((?:https?:)?\/\/)?(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)$/)
@@ -47,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       return res.status(400).send('roomId has invalid format')
     }
 
-    const [type, link, name] = getType(req.body?.link)
+    const [type, link, name] = await getType(req.body?.link)
     if(!type) {
       return res.status(400).send('link has invalid format')
     }

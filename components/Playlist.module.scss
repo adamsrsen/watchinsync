@@ -6,8 +6,12 @@
   align-items: center;
   padding: 1rem;
 
-  .video-name:hover {
-    color: $light-secondary;
+  .video-name {
+    text-overflow: ellipsis;
+
+    &:hover {
+      color: $light-secondary;
+    }
   }
 
   & > div {

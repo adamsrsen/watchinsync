@@ -67,6 +67,9 @@ export default class VideoJS extends Player {
 
   componentWillUnmount() {
     this?.player?.dispose()
+    this.props.socket.removeAllListeners('play')
+    this.props.socket.removeAllListeners('pause')
+    this.props.socket.removeAllListeners('seek')
   }
 
   render() {

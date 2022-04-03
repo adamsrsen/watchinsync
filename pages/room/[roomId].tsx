@@ -16,11 +16,12 @@ import Video from '../../objects/Video'
 import {decodeRoomId} from '../../lib/util'
 import axios from 'axios'
 import VideoJS from '../../components/players/VideoJS'
+import Youtube from '../../components/players/YouTube'
 
 const players = {
   '': Player,
   'direct': VideoJS,
-  'youtube': Player,
+  'youtube': Youtube,
   'vimeo': Player,
   'twitch': Player,
   'facebook': Player
