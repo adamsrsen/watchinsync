@@ -33,7 +33,7 @@ export default class Playlist extends Component<Props> {
                     }
                   }
                 ]}>
-                  <Image src="/more.svg" width={35} height={35} />
+                  <Image src="/more.svg" width={24} height={24} />
                 </Dropdown>
               </div>
             </div>

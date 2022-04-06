@@ -36,7 +36,6 @@ export default class Dropdown extends Component<Props> {
 
   toggle() {
     this.setState({opened: !this.state.opened, clicked: true})
-    console.log(this.state)
   }
 
   close() {

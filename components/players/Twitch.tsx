@@ -1,7 +1,7 @@
 import Player, {PlaybackState} from './Player'
-import styles from './Vimeo.module.scss'
+import styles from './Twitch.module.scss'
 
-export default class Vimeo extends Player {
+export default class Twitch extends Player {
   player: any
   remote: boolean
   playbackState: PlaybackState
@@ -15,9 +15,9 @@ export default class Vimeo extends Player {
 
   componentDidMount() {
     // @ts-ignore
-    if(!window.Vimeo) {
+    if(!window.Twitch) {
       const tag = document.createElement('script')
-      tag.src = 'https://player.vimeo.com/api/player.js'
+      tag.src = 'https://player.twitch.tv/js/embed/v1.js'
 
       tag.addEventListener('load', () => this.loadVideo())
 
@@ -28,70 +28,72 @@ export default class Vimeo extends Player {
     }
   }
 
-  async play() {
-    await this.player.play()
+  play() {
+    this.player.play()
   }
 
-  async pause() {
-    await this.player.pause()
+  pause() {
+    this.player.pause()
   }
 
-  async seek(time) {
+  seek(time) {
     this.remote = true
-    await this.player.setCurrentTime(time)
-    this.remote = false
+    this.player.seek(time)
   }
 
   loadVideo() {
     // @ts-ignore
-    this.player = new window.Vimeo.Player('vimeo-player', {
-      id: this.props.link,
-      responsive: true,
-      autoPause: false
+    this.player = new window.Twitch.Player('twitch-player', {
+      video: this.props.link,
+      width: '100%',
+      height: '100%',
+      autoplay: false
     })
 
-    this.player.on('play', (data) => {
+    // @ts-ignore
+    this.player.addEventListener(window.Twitch.Player.PLAY, () => {
       if(this.playbackState === PlaybackState.paused) {
-        this.props.socket.emit('play', data?.seconds)
-        setTimeout(async () => {
+        this.props.socket.emit('play', this.player.getCurrentTime())
+        setTimeout(() => {
           if(this.playbackState === PlaybackState.paused) {
-            await this.pause()
+            this.pause()
           }
         }, 100)
       }
     })
-    this.player.on('pause', (data) => {
+    // @ts-ignore
+    this.player.addEventListener(window.Twitch.Player.PAUSE, (e) => {
       if(this.playbackState === PlaybackState.playing) {
-        this.props.socket.emit('pause', data?.seconds)
-        setTimeout(async () => {
+        this.props.socket.emit('pause', this.player.getCurrentTime())
+        setTimeout(() => {
           if(this.playbackState === PlaybackState.playing) {
-            await this.play()
+            this.play()
           }
         }, 100)
       }
     })
-    this.player.on('seeked', (data) => {
+    // @ts-ignore
+    this.player.addEventListener(window.Twitch.Player.SEEK, (e) => {
       if(!this.remote) {
-        this.props.socket.emit('seek', data?.seconds)
+        this.props.socket.emit('seek', e.position)
       }
+      this.remote = false
     })
 
-    this.props.socket.on('play', async () => {
+    this.props.socket.on('play', () => {
       this.playbackState = PlaybackState.playing
-      await this.play()
+      this.play()
     })
-    this.props.socket.on('pause', async () => {
+    this.props.socket.on('pause', () => {
       this.playbackState = PlaybackState.paused
-      await this.pause()
+      this.pause()
     })
-    this.props.socket.on('seek', async (time) => {
-      await this.seek(time)
+    this.props.socket.on('seek', (time) => {
+      this.seek(time)
     })
   }
 
   componentWillUnmount() {
-    this?.player?.destroy()
-
     this.props.socket.removeAllListeners('play')
     this.props.socket.removeAllListeners('pause')
     this.props.socket.removeAllListeners('seek')
@@ -99,7 +101,7 @@ export default class Vimeo extends Player {
 
   render() {
     return (
-      <div id="vimeo-player" className={styles.player} />
+      <div id="twitch-player" className={styles.player} />
     )
   }
 }

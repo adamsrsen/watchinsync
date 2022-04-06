@@ -18,13 +18,14 @@ import axios from 'axios'
 import VideoJS from '../../components/players/VideoJS'
 import Youtube from '../../components/players/YouTube'
 import Vimeo from '../../components/players/Vimeo'
+import Twitch from '../../components/players/Twitch'
 
 const players = {
   '': Player,
   'direct': VideoJS,
   'youtube': Youtube,
   'vimeo': Vimeo,
-  'twitch': Player,
+  'twitch': Twitch,
   'facebook': Player
 }
 
