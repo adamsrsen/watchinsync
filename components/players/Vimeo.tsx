@@ -95,6 +95,8 @@ export default class Vimeo extends Player {
   }
 
   componentWillUnmount() {
+    this?.player?.destroy()
+
     this.props.socket.removeAllListeners('play')
     this.props.socket.removeAllListeners('pause')
     this.props.socket.removeAllListeners('seek')

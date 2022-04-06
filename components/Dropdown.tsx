@@ -4,20 +4,21 @@ import styles from './Dropdown.module.scss'
 import List from './List'
 import Item from './Item'
 
-export default class Dropdown extends Component {
+interface Props {
+  options: {
+    title: string,
+    href?: string,
+    onClick?: MouseEventHandler<HTMLDivElement>
+  }[]
+  children: ReactNode
+}
+
+export default class Dropdown extends Component<Props> {
   state: {
     opened: boolean,
     clicked: boolean
   }
-
-  props: {
-    options: {
-      title: string,
-      href?: string,
-      onClick?: MouseEventHandler<HTMLDivElement>
-    }[]
-    children: ReactNode
-  }
+  listener: any
 
   constructor(props) {
     super(props)
@@ -29,11 +30,13 @@ export default class Dropdown extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('click',() => this.close())
+    this.listener = () => this.close()
+    document.addEventListener('click', this.listener)
   }
 
-  toggle(event) {
+  toggle() {
     this.setState({opened: !this.state.opened, clicked: true})
+    console.log(this.state)
   }
 
   close() {
@@ -49,13 +52,13 @@ export default class Dropdown extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', () => this.close())
+    document.removeEventListener('click', this.listener)
   }
 
 
   render() {
     return (
-      <div className={styles.dropdown} onClick={(e) => this.toggle(e)}>
+      <div className={styles.dropdown} onClick={() => this.toggle()}>
         {this.props.children}
         <div className={`${styles['dropdown-items']}${this.state.opened ? ` ${styles['opened']}` : ''}`}>
           <List>

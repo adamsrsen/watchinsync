@@ -20,7 +20,7 @@ export default class Playlist extends Component<Props> {
         {this.props.playlist.map((video) => (
           <Item key={video.id}>
             <div className={styles.video}>
-              <div>
+              <div className={styles['no-overflow']}>
                 <Image src={`/${video.type}.png`} alt={video.type} width={30} height={30} />
                 <span className={styles['video-name']}>{video.name}</span>
               </div>
@@ -33,7 +33,7 @@ export default class Playlist extends Component<Props> {
                     }
                   }
                 ]}>
-                  <Image src="/more.svg" width={24} height={24} />
+                  <Image src="/more.svg" width={35} height={35} />
                 </Dropdown>
               </div>
             </div>

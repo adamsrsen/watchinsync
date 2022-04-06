@@ -1,23 +1,35 @@
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
-import Player from './Player'
+import Player, {PlaybackState} from './Player'
 import {createRef, RefObject} from 'react'
 import {getCookie} from '../../lib/util'
 
 export default class VideoJS extends Player {
-  state: {
-    remote: boolean
-  }
   videoRef: RefObject<any>
+  remote: boolean
+  playbackState: PlaybackState
   player: any
   
   constructor(props) {
     super(props)
 
-    this.state = {
-      remote: false
-    }
     this.videoRef = createRef()
+    this.remote = false
+    this.playbackState = PlaybackState.paused
+  }
+
+  play() {
+    this.player.play()
+  }
+
+  pause() {
+    this.player.pause()
+  }
+
+  seek(time) {
+    this.remote = true
+    this.player.currentTime(time)
+    this.remote = false
   }
 
   async componentDidMount() {
@@ -31,42 +43,37 @@ export default class VideoJS extends Player {
       document.cookie = `volume=${this.player.volume()}; max-age=${365*24*60*60}; path=/`
     })
     this.player.on('play', () => {
-      if(!this.state.remote) {
+      if(this.playbackState === PlaybackState.paused) {
         this.props.socket.emit('play', this.player.currentTime())
-        this.player.pause()
+        this.pause()
       }
-      this.setState({remote: !this.state.remote})
     })
     this.player.on('pause', () => {
-      if(!this.state.remote) {
+      if(this.playbackState === PlaybackState.playing) {
         this.props.socket.emit('pause', this.player.currentTime())
-        this.player.play()
+        this.play()
       }
-      this.setState({remote: !this.state.remote})
     })
     this.player.on('seeking', () => {
-      if(!this.state.remote) {
+      if(!this.remote) {
         this.props.socket.emit('seek', this.player.currentTime())
       }
-      this.setState({remote: !this.state.remote})
     })
 
     this.props.socket.on('play', () => {
-      this.setState({remote: true})
-      this.player.play()
+      this.playbackState = PlaybackState.playing
+      this.play()
     })
     this.props.socket.on('pause', () => {
-      this.setState({remote: true})
-      this.player.pause()
+      this.playbackState = PlaybackState.paused
+      this.pause()
     })
     this.props.socket.on('seek', (time) => {
-      this.setState({remote: true})
-      this.player.currentTime(time)
+      this.seek(time)
     })
   }
 
   componentWillUnmount() {
-    this?.player?.dispose()
     this.props.socket.removeAllListeners('play')
     this.props.socket.removeAllListeners('pause')
     this.props.socket.removeAllListeners('seek')

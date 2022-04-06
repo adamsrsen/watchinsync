@@ -8,6 +8,8 @@
 
   .video-name {
     text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 
     &:hover {
       color: $light-secondary;
@@ -17,6 +19,11 @@
   & > div {
     display: flex;
     align-items: center;
+
+    &.no-overflow {
+      max-width: 30rem;
+      overflow: hidden;
+    }
 
     & > * {
       margin-right: 1rem !important;

@@ -16,7 +16,8 @@ const getType = async (link) => {
 
   match = link.match(/^((?:https?:)?\/\/)?(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)$/)
   if(match) {
-    return [VideoType.VIMEO, match[4], match[4]]
+    const name = (await axios.get(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(link)}`)).data?.title
+    return [VideoType.VIMEO, match[4], name]
   }
 
   match = link.match(/^((?:https?:)?\/\/)?((?:www|m|clips)\.)?(twitch\.tv)\/(?:videos\/|\w+\/clip\/|)([\w\-]+)$/)

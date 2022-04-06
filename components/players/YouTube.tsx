@@ -1,23 +1,20 @@
-import Player from './Player'
+import Player, {PlaybackState} from './Player'
 import styles from './YouTube.module.scss'
-import internal from 'stream'
 
 export default class Youtube extends Player {
   player: any
-  state: {
-    remote: boolean
-    time: number
-    date: number
-  }
+  remote: boolean
+  playbackState: PlaybackState
+  time: number
+  date: number
 
   constructor(props) {
     super(props)
 
-    this.state = {
-      remote: false,
-      time: 0,
-      date: Date.now() / 1000
-    }
+    this.remote = false
+    this.playbackState = PlaybackState.paused
+    this.time = 0
+    this.date = Date.now() / 1000
   }
 
   componentDidMount() {
@@ -36,6 +33,22 @@ export default class Youtube extends Player {
     }
   }
 
+  play() {
+    this.player.playVideo()
+  }
+
+  pause() {
+    this.player.pauseVideo()
+  }
+
+  seek(time) {
+    this.remote = true
+    this.time = time
+    this.date = Date.now() / 1000
+    this.player.seekTo(time)
+    this.remote = false
+  }
+
   loadVideo() {
     // @ts-ignore
     this.player = new window.YT.Player('yt-player', {
@@ -45,43 +58,51 @@ export default class Youtube extends Player {
           switch(e.data) {
             // @ts-ignore
             case window.YT.PlayerState.PLAYING:
-              if(!this.state.remote) {
+              if(this.playbackState === PlaybackState.paused) {
                 this.props.socket.emit('play', this.player.getCurrentTime())
-                this.player.pauseVideo()
+                setTimeout(() => {
+                  if(this.playbackState === PlaybackState.paused) {
+                    this.pause()
+                  }
+                }, 100)
               }
               break
             // @ts-ignore
             case window.YT.PlayerState.PAUSED:
-              if(!this.state.remote) {
+              if(this.playbackState === PlaybackState.playing) {
                 this.props.socket.emit('pause', this.player.getCurrentTime())
-                this.player.playVideo()
+                setTimeout(() => {
+                  if(this.playbackState === PlaybackState.playing) {
+                    this.play()
+                  }
+                }, 100)
               }
               break
           }
           // @ts-ignore
-          if((e.data != window.YT.PlayerState.PLAYING || Math.abs(this.player.getCurrentTime() + this.state.date - this.state.time - Date.now() / 1000) > 1.5) && !this.state.remote) {
+          if(Math.abs(this.player.getCurrentTime() + this.date - this.time - Date.now() / 1000) > 2 && !this.remote) {
             this.props.socket.emit('seek', this.player.getCurrentTime())
           }
-          this.setState({remote: false})
         }
       }
     })
 
     this.props.socket.on('play', () => {
-      this.setState({remote: true})
-      this.player.playVideo()
+      this.playbackState = PlaybackState.playing
+      this.play()
     })
     this.props.socket.on('pause', () => {
-      this.setState({remote: true})
-      this.player.pauseVideo()
+      this.playbackState = PlaybackState.paused
+      this.pause()
     })
     this.props.socket.on('seek', (time) => {
-      this.setState({remote: true})
-      this.player.seekTo(time)
+      this.seek(time)
     })
   }
 
   componentWillUnmount() {
+    this?.player?.destroy()
+
     this.props.socket.removeAllListeners('play')
     this.props.socket.removeAllListeners('pause')
     this.props.socket.removeAllListeners('seek')
