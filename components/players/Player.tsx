@@ -7,6 +7,12 @@ interface Props {
   socket: Socket
 }
 
+
+export enum PlaybackState {
+  playing,
+  paused,
+}
+
 export default class Player extends Component<Props> {
   render() {
     return (
