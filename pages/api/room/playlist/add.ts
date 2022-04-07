@@ -25,7 +25,7 @@ const getType = async (link) => {
     return [VideoType.TWITCH, match[4], match[4]]
   }
 
-  match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?facebook\.com\/(?:.*?\/videos\/(\d+))$/)
+  match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?facebook\.com\/(?:(?:(?:.+\/)?videos\/(?:.+\/)?|watch\/\?v=)(\d+))\/?$/)
   if(match) {
     return [VideoType.FACEBOOK, match[3], match[3]]
   }

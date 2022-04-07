@@ -19,6 +19,7 @@ import VideoJS from '../../components/players/VideoJS'
 import Youtube from '../../components/players/YouTube'
 import Vimeo from '../../components/players/Vimeo'
 import Twitch from '../../components/players/Twitch'
+import Facebook from '../../components/players/Facebook'
 
 const players = {
   '': Player,
@@ -26,7 +27,7 @@ const players = {
   'youtube': Youtube,
   'vimeo': Vimeo,
   'twitch': Twitch,
-  'facebook': Player
+  'facebook': Facebook
 }
 
 interface Props {

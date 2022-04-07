@@ -62,7 +62,7 @@ export default class Twitch extends Player {
       }
     })
     // @ts-ignore
-    this.player.addEventListener(window.Twitch.Player.PAUSE, (e) => {
+    this.player.addEventListener(window.Twitch.Player.PAUSE, () => {
       if(this.playbackState === PlaybackState.playing) {
         this.props.socket.emit('pause', this.player.getCurrentTime())
         setTimeout(() => {
@@ -73,9 +73,9 @@ export default class Twitch extends Player {
       }
     })
     // @ts-ignore
-    this.player.addEventListener(window.Twitch.Player.SEEK, (e) => {
+    this.player.addEventListener(window.Twitch.Player.SEEK, ({position}) => {
       if(!this.remote) {
-        this.props.socket.emit('seek', e.position)
+        this.props.socket.emit('seek', position)
       }
       this.remote = false
     })
