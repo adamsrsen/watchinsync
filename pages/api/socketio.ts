@@ -2,8 +2,6 @@ import {NextApiRequest} from 'next'
 import { Server } from 'socket.io'
 import {NextApiResponseSocketIO} from '../../objects/NextApiResponseSocketIO'
 import * as http from 'http'
-import Videos from '../../entity/Videos'
-import getConnection from '../../lib/db'
 
 class RoomVariables {
   users: number = 0
@@ -36,6 +34,9 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
         })
         socket.on('seek', (time) => {
           io.in(roomId).emit('seek', time)
+        })
+        socket.on('playback_rate', (playbackRate) => {
+          io.in(roomId).emit('playback_rate', playbackRate)
         })
       })
 

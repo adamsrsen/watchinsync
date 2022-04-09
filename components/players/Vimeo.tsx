@@ -1,20 +1,7 @@
 import Player, {PlaybackState} from './Player'
 import styles from './Vimeo.module.scss'
-import _ from 'lodash'
-import axios from 'axios'
 
 export default class Vimeo extends Player {
-  player: any
-  remote: boolean
-  playbackState: PlaybackState
-
-  constructor(props) {
-    super(props)
-
-    this.remote = false
-    this.playbackState = PlaybackState.paused
-  }
-
   componentDidMount() {
     // @ts-ignore
     if(!window.Vimeo) {
@@ -39,22 +26,27 @@ export default class Vimeo extends Player {
   }
 
   async seek(time) {
-    this.remote = true
+    super.seek(time)
     await this.player.setCurrentTime(time)
-    this.remote = false
+  }
+
+  async setPlaybackRate(playbackRate) {
+    super.setPlaybackRate(playbackRate)
+    await this.player.setPlaybackRate(playbackRate)
   }
 
   loadVideo() {
     if(this.player){
       this.player.destroy()
     }
+
     // @ts-ignore
     this.player = new window.Vimeo.Player('vimeo-player', {
       id: this.props.link,
-      responsive: true,
-      autoPause: false
+      responsive: true
     })
 
+    // Listen to play event and send socket if it was user input
     this.player.on('play', (data) => {
       if(this.playbackState === PlaybackState.paused) {
         this.props.socket.emit('play', data?.seconds)
@@ -65,6 +57,7 @@ export default class Vimeo extends Player {
         }, 100)
       }
     })
+    // Listen to pause event and send socket if it was user input
     this.player.on('pause', (data) => {
       if(this.playbackState === PlaybackState.playing) {
         this.props.socket.emit('pause', data?.seconds)
@@ -75,44 +68,31 @@ export default class Vimeo extends Player {
         }, 100)
       }
     })
+    // Listen to seek event and send socket if it was user input
     this.player.on('seeked', (data) => {
       if(!this.remote) {
         this.props.socket.emit('seek', data?.seconds)
       }
+      this.remote = false
     })
+    // Listen to playback rate event and send socket if it was user input
+    this.player.on('playbackratechange', ({playbackRate}) => {
+      if(playbackRate !== this.playbackRate) {
+        this.props.socket.emit('playback_rate', playbackRate)
+      }
+    })
+    // Listen to end event and play next
     this.player.on('ended', () => {
-      axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+      this.ended()
     })
 
-    this.props.socket.off('play')
-    this.props.socket.off('pause')
-    this.props.socket.off('seek')
-
-    this.props.socket.on('play', async () => {
-      this.playbackState = PlaybackState.playing
-      await this.play()
-    })
-    this.props.socket.on('pause', async () => {
-      this.playbackState = PlaybackState.paused
-      await this.pause()
-    })
-    this.props.socket.on('seek', async (time) => {
-      await this.seek(time)
-    })
-  }
-
-  componentDidUpdate(prevProps) {
-    if(!_.isEqual(this.props, prevProps)){
-      this.loadVideo()
-    }
+    this.initSockets()
   }
 
   componentWillUnmount() {
     this?.player?.destroy()
 
-    this.props.socket.removeAllListeners('play')
-    this.props.socket.removeAllListeners('pause')
-    this.props.socket.removeAllListeners('seek')
+    this.deinitSockets()
   }
 
   render() {

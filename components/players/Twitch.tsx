@@ -1,20 +1,7 @@
 import Player, {PlaybackState} from './Player'
 import styles from './Twitch.module.scss'
-import _ from 'lodash'
-import axios from 'axios'
 
 export default class Twitch extends Player {
-  player: any
-  remote: boolean
-  playbackState: PlaybackState
-
-  constructor(props) {
-    super(props)
-
-    this.remote = false
-    this.playbackState = PlaybackState.paused
-  }
-
   componentDidMount() {
     // @ts-ignore
     if(!window.Twitch) {
@@ -39,7 +26,7 @@ export default class Twitch extends Player {
   }
 
   seek(time) {
-    this.remote = true
+    super.seek(time)
     this.player.seek(time)
   }
 
@@ -56,6 +43,7 @@ export default class Twitch extends Player {
         autoplay: false
       })
 
+      // Listen to play event and send socket if it was user input
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.PLAY, () => {
         if(this.playbackState === PlaybackState.paused) {
@@ -67,6 +55,7 @@ export default class Twitch extends Player {
           }, 100)
         }
       })
+      // Listen to pause event and send socket if it was user input
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.PAUSE, () => {
         if(this.playbackState === PlaybackState.playing) {
@@ -78,6 +67,7 @@ export default class Twitch extends Player {
           }, 100)
         }
       })
+      // Listen to seek event and send socket if it was user input
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.SEEK, ({position}) => {
         if(!this.remote) {
@@ -85,35 +75,18 @@ export default class Twitch extends Player {
         }
         this.remote = false
       })
+      // Listen to end event and play next
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.ENDED, () => {
-        axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+        this.ended()
       })
 
-      this.props.socket.on('play', () => {
-        this.playbackState = PlaybackState.playing
-        this.play()
-      })
-      this.props.socket.on('pause', () => {
-        this.playbackState = PlaybackState.paused
-        this.pause()
-      })
-      this.props.socket.on('seek', (time) => {
-        this.seek(time)
-      })
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if(!_.isEqual(this.props, prevProps)) {
-      this.loadVideo()
+      this.initSockets()
     }
   }
 
   componentWillUnmount() {
-    this.props.socket.removeAllListeners('play')
-    this.props.socket.removeAllListeners('pause')
-    this.props.socket.removeAllListeners('seek')
+    this.deinitSockets()
   }
 
   render() {

@@ -1,23 +1,8 @@
-import _ from 'lodash'
 import Player, {PlaybackState} from './Player'
 import styles from './YouTube.module.scss'
-import axios from 'axios'
 
 export default class Youtube extends Player {
-  player: any
-  remote: boolean
-  playbackState: PlaybackState
-  time: number
-  date: number
-
-  constructor(props) {
-    super(props)
-
-    this.remote = false
-    this.playbackState = PlaybackState.paused
-    this.time = 0
-    this.date = Date.now() / 1000
-  }
+  interval: any
 
   componentDidMount() {
     // @ts-ignore
@@ -44,23 +29,34 @@ export default class Youtube extends Player {
   }
 
   seek(time) {
-    this.remote = true
-    this.time = time
-    this.date = Date.now() / 1000
+    super.seek(time)
     this.player.seekTo(time)
     this.remote = false
+  }
+
+  setPlaybackRate(playbackRate) {
+    super.setPlaybackRate(playbackRate)
+    this.player.setPlaybackRate(playbackRate)
+    const checkPlaybackRate = setInterval(() => {
+      if(this.player.getPlaybackRate() === this.playbackRate) {
+        return clearInterval(checkPlaybackRate)
+      }
+      this.player.setPlaybackRate(this.playbackRate)
+    }, 1000)
   }
 
   loadVideo() {
     if(this.player){
       this.player.destroy()
     }
+
     // @ts-ignore
     this.player = new window.YT.Player('yt-player', {
       videoId: this.props.link,
       events: {
         'onStateChange': (e) => {
           switch(e.data) {
+            // Listen to play event and send socket if it was user input
             // @ts-ignore
             case window.YT.PlayerState.PLAYING:
               if(this.playbackState === PlaybackState.paused) {
@@ -72,6 +68,7 @@ export default class Youtube extends Player {
                 }, 100)
               }
               break
+            // Listen to pause event and send socket if it was user input
             // @ts-ignore
             case window.YT.PlayerState.PAUSED:
               if(this.playbackState === PlaybackState.playing) {
@@ -83,50 +80,40 @@ export default class Youtube extends Player {
                 }, 100)
               }
               break
+            // Listen to end event and play next
             // @ts-ignore
             case window.YT.PlayerState.ENDED:
-              axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+              this.ended()
               break
           }
-          // @ts-ignore
-          if(Math.abs(this.player.getCurrentTime() + this.date - this.time - Date.now() / 1000) > 2 && !this.remote) {
-            this.props.socket.emit('seek', this.player.getCurrentTime())
+        },
+        // Listen to playback rate event and send socket if it was user input
+        'onPlaybackRateChange': (e) => {
+          if(e.data !== this.playbackRate) {
+            this.props.socket.emit('playback_rate', e.data)
           }
         }
       }
     })
 
-    this.props.socket.off('play')
-    this.props.socket.off('pause')
-    this.props.socket.off('seek')
+    // Detecting seek and sending socket
+    clearInterval(this.interval)
+    this.interval = setInterval(() => {
+      if(((Math.abs(this.player.getCurrentTime() + this.date - this.time - Date.now() / 1000) > 2 && this.playbackState === PlaybackState.playing)
+        || (Math.abs(this.player.getCurrentTime() - this.time) > 0 && this.playbackState === PlaybackState.paused))
+        && !this.remote) {
+        this.props.socket.emit('seek', this.player.getCurrentTime())
+      }
+    }, 1000)
 
-    this.props.socket.on('play', () => {
-      this.playbackState = PlaybackState.playing
-      this.play()
-    })
-    this.props.socket.on('pause', () => {
-      console.log('pause')
-      console.log(this.player)
-      this.playbackState = PlaybackState.paused
-      this.pause()
-    })
-    this.props.socket.on('seek', (time) => {
-      this.seek(time)
-    })
-  }
-
-  componentDidUpdate(prevProps) {
-    if(!_.isEqual(this.props, prevProps)){
-      this.loadVideo()
-    }
+    this.initSockets()
   }
 
   componentWillUnmount() {
+    clearInterval(this.interval)
     this?.player?.destroy()
 
-    this.props.socket.removeAllListeners('play')
-    this.props.socket.removeAllListeners('pause')
-    this.props.socket.removeAllListeners('seek')
+    this.deinitSockets()
   }
 
   render() {

@@ -3,21 +3,18 @@ import 'video.js/dist/video-js.css'
 import Player, {PlaybackState} from './Player'
 import {createRef, RefObject} from 'react'
 import {getCookie} from '../../lib/util'
-import _ from 'lodash'
-import axios from 'axios'
 
 export default class VideoJS extends Player {
   videoRef: RefObject<any>
-  remote: boolean
-  playbackState: PlaybackState
-  player: any
-  
+
   constructor(props) {
     super(props)
 
     this.videoRef = createRef()
-    this.remote = false
-    this.playbackState = PlaybackState.paused
+  }
+
+  componentDidMount() {
+    this.loadVideo()
   }
 
   async play() {
@@ -29,12 +26,8 @@ export default class VideoJS extends Player {
   }
 
   seek(time) {
-    this.remote = true
+    super.seek(time)
     this.player.currentTime(time)
-  }
-
-  componentDidMount() {
-    this.loadVideo()
   }
 
   loadVideo() {
@@ -48,57 +41,42 @@ export default class VideoJS extends Player {
         this.player.volume(getCookie('volume'))
       })
 
+      // Save current volume and set it in future VideoJS players
       this.player.on('volumechange', () => {
         document.cookie = `volume=${this.player.volume()}; max-age=${365 * 24 * 60 * 60}; path=/`
       })
+      // Listen to play event and send socket if it was user input
       this.player.on('play', () => {
         if (this.playbackState === PlaybackState.paused) {
           this.props.socket.emit('play', this.player.currentTime())
           this.pause()
         }
       })
+      // Listen to pause event and send socket if it was user input
       this.player.on('pause', async () => {
         if (this.playbackState === PlaybackState.playing) {
           this.props.socket.emit('pause', this.player.currentTime())
           await this.play()
         }
       })
+      // Listen to seek event and send socket if it was user input
       this.player.on('seeking', () => {
         if (!this.remote) {
           this.props.socket.emit('seek', this.player.currentTime())
         }
         this.remote = false
       })
+      // Listen to end event and play next
       this.player.on('ended', () => {
-        axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+        this.ended()
       })
 
-      this.props.socket.on('play', async () => {
-        this.playbackState = PlaybackState.playing
-        await this.play()
-      })
-      this.props.socket.on('pause', () => {
-        this.playbackState = PlaybackState.paused
-        this.pause()
-      })
-      this.props.socket.on('seek', (time) => {
-        this.seek(time)
-      })
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if(!_.isEqual(this.props, prevProps)){
-      this.forceUpdate()
-
-      this.loadVideo()
+      this.initSockets()
     }
   }
 
   componentWillUnmount() {
-    this.props.socket.removeAllListeners('play')
-    this.props.socket.removeAllListeners('pause')
-    this.props.socket.removeAllListeners('seek')
+    this.deinitSockets()
   }
 
   render() {
