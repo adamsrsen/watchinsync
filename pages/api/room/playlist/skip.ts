@@ -18,16 +18,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       return res.status(400).send('roomId has invalid format')
     }
 
+    if(req.body?.delay === undefined) {
+      return res.status(400).send('delay not specified')
+    }
+
     const connection = await getConnection()
     try {
       await connection
         .createQueryBuilder()
-        .delete()
-        .from<Videos>('Videos')
+        .update<Videos>('Videos')
+        .set({
+          played: true
+        })
         .where('id = :videoId AND room.id = :roomId', {videoId: req.body?.videoId, roomId})
         .execute()
 
-      res.socket?.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
+      const io = res.socket?.server?.io
+      setTimeout(() => {
+        io.in(req.body?.roomId.toString()).emit('skip', req.body?.videoId)
+      }, req.body.delay)
 
       res.end()
     }
@@ -39,3 +48,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
     res.status(404).send('')
   }
 }
+

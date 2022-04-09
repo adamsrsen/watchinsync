@@ -3,6 +3,8 @@ import 'video.js/dist/video-js.css'
 import Player, {PlaybackState} from './Player'
 import {createRef, RefObject} from 'react'
 import {getCookie} from '../../lib/util'
+import _ from 'lodash'
+import axios from 'axios'
 
 export default class VideoJS extends Player {
   videoRef: RefObject<any>
@@ -18,8 +20,8 @@ export default class VideoJS extends Player {
     this.playbackState = PlaybackState.paused
   }
 
-  play() {
-    this.player.play()
+  async play() {
+    await this.player.play()
   }
 
   pause() {
@@ -29,48 +31,68 @@ export default class VideoJS extends Player {
   seek(time) {
     this.remote = true
     this.player.currentTime(time)
-    this.remote = false
   }
 
-  async componentDidMount() {
-    this.player = videojs(this.videoRef.current, {
-      fluid: true
-    }, () => {
-      this.player.volume(getCookie('volume'))
-    })
+  componentDidMount() {
+    this.loadVideo()
+  }
 
-    this.player.on('volumechange', () => {
-      document.cookie = `volume=${this.player.volume()}; max-age=${365*24*60*60}; path=/`
-    })
-    this.player.on('play', () => {
-      if(this.playbackState === PlaybackState.paused) {
-        this.props.socket.emit('play', this.player.currentTime())
+  loadVideo() {
+    if(this.player){
+      this.player.load()
+    }
+    else {
+      this.player = videojs(this.videoRef.current, {
+        fluid: true
+      }, () => {
+        this.player.volume(getCookie('volume'))
+      })
+
+      this.player.on('volumechange', () => {
+        document.cookie = `volume=${this.player.volume()}; max-age=${365 * 24 * 60 * 60}; path=/`
+      })
+      this.player.on('play', () => {
+        if (this.playbackState === PlaybackState.paused) {
+          this.props.socket.emit('play', this.player.currentTime())
+          this.pause()
+        }
+      })
+      this.player.on('pause', async () => {
+        if (this.playbackState === PlaybackState.playing) {
+          this.props.socket.emit('pause', this.player.currentTime())
+          await this.play()
+        }
+      })
+      this.player.on('seeking', () => {
+        if (!this.remote) {
+          this.props.socket.emit('seek', this.player.currentTime())
+        }
+        this.remote = false
+      })
+      this.player.on('ended', () => {
+        axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+      })
+
+      this.props.socket.on('play', async () => {
+        this.playbackState = PlaybackState.playing
+        await this.play()
+      })
+      this.props.socket.on('pause', () => {
+        this.playbackState = PlaybackState.paused
         this.pause()
-      }
-    })
-    this.player.on('pause', () => {
-      if(this.playbackState === PlaybackState.playing) {
-        this.props.socket.emit('pause', this.player.currentTime())
-        this.play()
-      }
-    })
-    this.player.on('seeking', () => {
-      if(!this.remote) {
-        this.props.socket.emit('seek', this.player.currentTime())
-      }
-    })
+      })
+      this.props.socket.on('seek', (time) => {
+        this.seek(time)
+      })
+    }
+  }
 
-    this.props.socket.on('play', () => {
-      this.playbackState = PlaybackState.playing
-      this.play()
-    })
-    this.props.socket.on('pause', () => {
-      this.playbackState = PlaybackState.paused
-      this.pause()
-    })
-    this.props.socket.on('seek', (time) => {
-      this.seek(time)
-    })
+  componentDidUpdate(prevProps) {
+    if(!_.isEqual(this.props, prevProps)){
+      this.forceUpdate()
+
+      this.loadVideo()
+    }
   }
 
   componentWillUnmount() {

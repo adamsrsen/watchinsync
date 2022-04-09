@@ -3,6 +3,8 @@ import styles from './Player.module.scss'
 import {Socket} from 'socket.io-client'
 
 interface Props {
+  roomId: number
+  videoId: number
   link: string
   socket: Socket
 }

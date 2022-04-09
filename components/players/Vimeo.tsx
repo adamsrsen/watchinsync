@@ -1,5 +1,7 @@
 import Player, {PlaybackState} from './Player'
 import styles from './Vimeo.module.scss'
+import _ from 'lodash'
+import axios from 'axios'
 
 export default class Vimeo extends Player {
   player: any
@@ -43,6 +45,9 @@ export default class Vimeo extends Player {
   }
 
   loadVideo() {
+    if(this.player){
+      this.player.destroy()
+    }
     // @ts-ignore
     this.player = new window.Vimeo.Player('vimeo-player', {
       id: this.props.link,
@@ -75,6 +80,13 @@ export default class Vimeo extends Player {
         this.props.socket.emit('seek', data?.seconds)
       }
     })
+    this.player.on('ended', () => {
+      axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+    })
+
+    this.props.socket.off('play')
+    this.props.socket.off('pause')
+    this.props.socket.off('seek')
 
     this.props.socket.on('play', async () => {
       this.playbackState = PlaybackState.playing
@@ -87,6 +99,12 @@ export default class Vimeo extends Player {
     this.props.socket.on('seek', async (time) => {
       await this.seek(time)
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    if(!_.isEqual(this.props, prevProps)){
+      this.loadVideo()
+    }
   }
 
   componentWillUnmount() {

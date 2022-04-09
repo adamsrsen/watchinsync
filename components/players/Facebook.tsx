@@ -1,4 +1,5 @@
 import Player, {PlaybackState} from './Player'
+import axios from 'axios'
 
 export default class Facebook extends Player {
   player: any
@@ -52,6 +53,8 @@ export default class Facebook extends Player {
 
   loadVideo() {
     // @ts-ignore
+    window.FB.Event.unsubscribe('xfbml.ready')
+    // @ts-ignore
     window.FB.Event.subscribe('xfbml.ready', (msg) => {
       if (msg.type === 'video') {
         this.player = msg.instance
@@ -77,11 +80,20 @@ export default class Facebook extends Player {
           }
         })
         setInterval(() => {
-          if(Math.abs(this.player.getCurrentPosition() + this.date - this.time - Date.now() / 1000) > 2 && !this.remote) {
+          if(((Math.abs(this.player.getCurrentPosition() + this.date - this.time - Date.now() / 1000) > 2 && this.playbackState === PlaybackState.playing)
+            || (Math.abs(this.player.getCurrentPosition() - this.time) > 0 && this.playbackState === PlaybackState.paused))
+            && !this.remote) {
             this.props.socket.emit('seek', this.player.getCurrentPosition())
           }
           this.remote = false
         }, 1000)
+        this.player.subscribe('finishedPlaying', () => {
+          axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+        })
+
+        this.props.socket.off('play')
+        this.props.socket.off('pause')
+        this.props.socket.off('seek')
 
         this.props.socket.on('play', () => {
           this.playbackState = PlaybackState.playing
@@ -99,6 +111,10 @@ export default class Facebook extends Player {
 
     // @ts-ignore
     window.FB.XFBML.parse()
+  }
+
+  componentDidUpdate() {
+    this.loadVideo()
   }
 
   componentWillUnmount() {

@@ -31,6 +31,12 @@ export default class Playlist extends Component<Props> {
                     onClick: () => {
                       axios.post('/api/room/playlist/remove', {roomId: this.props.room.id, videoId: video.id}).then(() => {}).catch((e) => {})
                     }
+                  },
+                  {
+                    title: 'Skip',
+                    onClick: () => {
+                      axios.post('/api/room/playlist/skip', {roomId: this.props.room.id, videoId: video.id, delay: 0}).then(() => {}).catch((e) => {})
+                    }
                   }
                 ]}>
                   <Image src="/more.svg" width={24} height={24} />

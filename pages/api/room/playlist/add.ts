@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         })
         .execute()
 
-      res.socket.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
+      res.socket?.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
 
       res.end()
     }

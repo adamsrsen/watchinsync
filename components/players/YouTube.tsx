@@ -1,5 +1,7 @@
+import _ from 'lodash'
 import Player, {PlaybackState} from './Player'
 import styles from './YouTube.module.scss'
+import axios from 'axios'
 
 export default class Youtube extends Player {
   player: any
@@ -50,6 +52,9 @@ export default class Youtube extends Player {
   }
 
   loadVideo() {
+    if(this.player){
+      this.player.destroy()
+    }
     // @ts-ignore
     this.player = new window.YT.Player('yt-player', {
       videoId: this.props.link,
@@ -78,6 +83,10 @@ export default class Youtube extends Player {
                 }, 100)
               }
               break
+            // @ts-ignore
+            case window.YT.PlayerState.ENDED:
+              axios.post('/api/room/playlist/skip', {roomId: this.props.roomId, videoId: this.props.videoId, delay: 1000}).then(() => {}).catch((e) => {})
+              break
           }
           // @ts-ignore
           if(Math.abs(this.player.getCurrentTime() + this.date - this.time - Date.now() / 1000) > 2 && !this.remote) {
@@ -87,17 +96,29 @@ export default class Youtube extends Player {
       }
     })
 
+    this.props.socket.off('play')
+    this.props.socket.off('pause')
+    this.props.socket.off('seek')
+
     this.props.socket.on('play', () => {
       this.playbackState = PlaybackState.playing
       this.play()
     })
     this.props.socket.on('pause', () => {
+      console.log('pause')
+      console.log(this.player)
       this.playbackState = PlaybackState.paused
       this.pause()
     })
     this.props.socket.on('seek', (time) => {
       this.seek(time)
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    if(!_.isEqual(this.props, prevProps)){
+      this.loadVideo()
+    }
   }
 
   componentWillUnmount() {

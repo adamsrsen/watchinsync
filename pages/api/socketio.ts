@@ -2,11 +2,11 @@ import {NextApiRequest} from 'next'
 import { Server } from 'socket.io'
 import {NextApiResponseSocketIO} from '../../objects/NextApiResponseSocketIO'
 import * as http from 'http'
+import Videos from '../../entity/Videos'
+import getConnection from '../../lib/db'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
+class RoomVariables {
+  users: number = 0
 }
 
 export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
@@ -15,11 +15,16 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
       path: '/api/socketio',
     })
     res.socket.server.io = io
+    const rooms = new Map<string, RoomVariables>()
 
     io.on('connection', (socket) => {
       socket.on('join', (roomId) => {
         socket.join(roomId)
         io.in(roomId).emit('pause')
+        if(!rooms.has(roomId)){
+          rooms.set(roomId, new RoomVariables())
+        }
+        rooms.get(roomId).users++
 
         socket.on('play', (time) => {
           io.in(roomId).emit('seek', time)
@@ -32,6 +37,17 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
         socket.on('seek', (time) => {
           io.in(roomId).emit('seek', time)
         })
+      })
+
+      socket.on('disconnecting', () => {
+        for(const roomId of socket.rooms) {
+          if(rooms.has(roomId)) {
+            const room = rooms.get(roomId)
+            if(--room.users === 0){
+              rooms.delete(roomId)
+            }
+          }
+        }
       })
     })
   }

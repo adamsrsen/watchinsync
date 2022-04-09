@@ -56,9 +56,16 @@ class RoomPage extends Component<Props> {
         this.setState({playlist: res.data})
       }).catch((e) => {})
     })
+    this.socket.on('skip', (videoId) => {
+      this.setState({playlist: this.state.playlist.filter((video) => video.id !== videoId)})
+    })
     this.socket.emit('join', this.props.room.id)
 
     this.player = createRef()
+  }
+
+  componentWillUnmount() {
+    this.socket.disconnect()
   }
 
   render() {
@@ -90,7 +97,7 @@ class RoomPage extends Component<Props> {
         <RoomHeader room={this.props.room} />
         <div className={styles.content}>
           <div className={styles['player-container']}>
-            <VideoPlayer ref={this.player} link={this.state.playlist[0]?.link} socket={this.socket} />
+            <VideoPlayer ref={this.player} roomId={this.props.room.id} videoId={this.state.playlist[0]?.id} link={this.state.playlist[0]?.link} socket={this.socket} />
           </div>
           <div className={styles.sidebar}>
             <Tabs tabs={[
