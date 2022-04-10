@@ -1,4 +1,5 @@
-﻿# Report 1 (14.3.2022 - 20.3.2022)
+﻿# WatchInSync - Adam Sršeň
+# Report 1 (14.3.2022 - 20.3.2022)
 ## Týždenný plán
 
  - vytvorenie základného stýlu a kostry projektu
