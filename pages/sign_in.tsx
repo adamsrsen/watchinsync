@@ -6,10 +6,42 @@ import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import {toast} from 'react-hot-toast'
+import axios from 'axios'
+import {Router, withRouter} from 'next/router'
+import {preventDefault} from '../lib/util'
 
-export default class SignIn extends Component {
-  props: {
-    user: User
+interface Props {
+  user: User
+  updateUser: Function
+  router: Router
+}
+
+class SignIn extends Component<Props> {
+  state: {
+    email: string
+    password: string
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      email: '',
+      password: '',
+    }
+  }
+
+  login() {
+    toast.promise(axios.post('/api/user/login', {email: this.state.email, password: this.state.password}), {
+      loading: 'Signing in...',
+      success: () => {
+        this.props.updateUser()
+        this.props.router.push('/')
+        return 'Successfully signed in'
+      },
+      error: 'Invalid credentials'
+    })
   }
 
   render() {
@@ -22,14 +54,28 @@ export default class SignIn extends Component {
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="text" placeholder="Email" />
-          <Input type="password" placeholder="Password" />
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
-            <b>SIGN IN</b>
-          </Button>
+          <form onSubmit={preventDefault(() => this.login())}>
+            <Input
+              type="text"
+              placeholder="Email"
+              value={this.state.email}
+              onChange={({target}) => this.setState({email: target.value})}
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={this.state.password}
+              onChange={({target}) => this.setState({password: target.value})}
+            />
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+              <b>SIGN IN</b>
+            </Button>
+          </form>
           <p>Don&#39;t you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
         </CenteredContent>
       </div>
     )
   }
 }
+
+export default withRouter(SignIn)

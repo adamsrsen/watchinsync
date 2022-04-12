@@ -85,6 +85,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({params}) {
   const {page} = params
+  console.log(typeof ((parseInt(page) - 1) * 25))
 
   const connection = await getConnection()
   const rooms = await connection
@@ -94,7 +95,7 @@ export async function getStaticProps({params}) {
     .where('room.public = :public', {public: true})
     .orderBy('room.name', 'ASC')
     .limit(25)
-    .offset((page - 1) * 25)
+    .offset((parseInt(page) - 1) * 25)
     .getMany()
 
   return {

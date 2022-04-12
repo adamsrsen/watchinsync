@@ -28,7 +28,7 @@ export default class Header extends Component {
                   {this.props.user.username}
                 </a>
               </Link>
-              <Link href="/sign_out">
+              <Link href="/api/user/logout">
                 <a className={[styles['header-link'], styles['header-text']].join(' ')}>
                   Sign out
                 </a>

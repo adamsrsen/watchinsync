@@ -42,3 +42,9 @@ p {
 .center {
   text-align: center;
 }
+
+.error {
+  margin: 0 1rem;
+  color: $error;
+  font-size: 1.25rem;
+}

@@ -40,3 +40,6 @@ yarn-error.log*
 # temporary
 tmp/
 temp/
+
+# enviroment variables
+.env

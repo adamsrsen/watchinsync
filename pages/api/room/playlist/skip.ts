@@ -18,10 +18,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       return res.status(400).send('roomId has invalid format')
     }
 
-    if(req.body?.delay === undefined) {
-      return res.status(400).send('delay not specified')
-    }
-
     const connection = await getConnection()
     try {
       await connection
@@ -36,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
       const io = res.socket?.server?.io
       setTimeout(() => {
         io.in(req.body?.roomId.toString()).emit('skip', req.body?.videoId)
-      }, req.body.delay)
+      }, req.body.delay ?? 1000)
 
       res.end()
     }
