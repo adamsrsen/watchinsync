@@ -13,18 +13,20 @@ const login = async function(req: NextApiRequest, res: NextApiResponse) {
 
     const connection = await getConnection()
     try {
-      const user = await connection
+      const userDB = await connection
         .getRepository<Users>('Users')
         .createQueryBuilder('user')
         .where('user.email = :email', {email: req.body?.email})
         .getOne()
-      if(user && await bcrypt.compare(req.body?.password, user.password)){
-        req.session.user = {
-          id: user.id,
-          username: user.username
+      if(userDB && await bcrypt.compare(req.body?.password, userDB.password)){
+        const user = {
+          id: userDB.id,
+          username: userDB.username,
+          email: userDB.email
         }
+        req.session.user = user
         await req.session.save()
-        res.end()
+        res.json(user)
       }
       else {
         res.status(400).send('invalid credentials')

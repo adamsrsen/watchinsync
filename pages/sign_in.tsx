@@ -13,7 +13,7 @@ import {preventDefault} from '../lib/util'
 
 interface Props {
   user: User
-  updateUser: Function
+  setUser: Function
   router: Router
 }
 
@@ -35,8 +35,8 @@ class SignIn extends Component<Props> {
   login() {
     toast.promise(axios.post('/api/user/login', {email: this.state.email, password: this.state.password}), {
       loading: 'Signing in...',
-      success: () => {
-        this.props.updateUser()
+      success: ({data}) => {
+        this.props.setUser(data)
         this.props.router.push('/')
         return 'Successfully signed in'
       },

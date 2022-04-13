@@ -4,24 +4,25 @@ import {promisify} from 'util'
 import getConnection from '../../../lib/db'
 import Users from '../../../entity/Users'
 import bcrypt from 'bcrypt'
+import {checkEmail, checkPassword, checkPasswords, checkUsername} from '../../../lib/util'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST') {
     await promisify(bodyParser.urlencoded())(req,res)
 
-    if(!req.body?.username){
+    if(!checkUsername(req.body?.username)){
       return res.status(400).send('username is not specified')
     }
 
-    if(!req.body?.email){
-      return res.status(400).send('email is not specified')
+    if(!checkEmail(req.body?.email)){
+      return res.status(400).send('email is invalid')
     }
 
-    if(!req.body?.password){
-      return res.status(400).send('password is not specified')
+    if(!checkPassword(req.body?.password)){
+      return res.status(400).send('password is invalid')
     }
 
-    if(req.body.password !== req.body?.passwordRepeat){
+    if(!checkPasswords(req.body?.password, req.body?.passwordRepeat)){
       return res.status(400).send('passwords does not match')
     }
 

@@ -6,6 +6,7 @@ interface Props {
   placeholder: string
   value?: string
   error?: string
+  forceError?: boolean
   onChange?: ChangeEventHandler<HTMLInputElement>
 }
 
@@ -34,7 +35,7 @@ export default class Input extends Component<Props> {
           onChange={this.props.onChange}
           onBlur={() => this.setState({used: true})}
         />
-        {this.props.error && this.state.used && (
+        {this.props.error && (this.state.used || this.props.forceError) && (
           <p className="error">{this.props.error}</p>
         )}
       </>

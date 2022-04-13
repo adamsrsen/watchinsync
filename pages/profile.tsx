@@ -6,10 +6,59 @@ import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
 import Divider from '../components/Divider'
+import {checkEmail, checkUsername, preventDefault} from '../lib/util'
+import _ from 'lodash'
+import {toast} from 'react-hot-toast'
+import axios from 'axios'
 
-export default class Profile extends Component {
-  props: {
-    user: User
+interface Props {
+  user: User
+  setUser: Function
+}
+
+export default class Profile extends Component<Props> {
+  state: {
+    username: string
+    email: string
+    forceError: boolean
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      username: this.props?.user?.username || '',
+      email: this.props?.user?.email || '',
+      forceError: false
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if(!_.isEqual(this.props, prevProps)){
+      this.setState({
+        username: this.props?.user?.username || '',
+        email: this.props?.user?.email || ''
+      })
+    }
+  }
+
+  save() {
+    if(checkUsername(this.state.username) && checkEmail(this.state.email)) {
+      toast.promise(axios.post('/api/user/update', this.state), {
+        loading: 'Saving changes...',
+        success: ({data}) => {
+          this.props.setUser(data)
+          return 'Changes successfully saved'
+        },
+        error: 'Error occurred please try again later'
+      })
+    }
+    else {
+      toast.error('There are errors in form')
+      this.setState({
+        forceError: true
+      })
+    }
   }
 
   render() {
@@ -22,11 +71,26 @@ export default class Profile extends Component {
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="text" placeholder="Username" />
-          <Input type="text" placeholder="Email" />
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
-            <b>SAVE</b>
-          </Button>
+          <form onSubmit={preventDefault(() => this.save())}>
+            <Input
+              type="text"
+              placeholder="Username"
+              value={this.state.username}
+              error={checkUsername(this.state.username) ? '' : 'Username is required field'}
+              onChange={({target}) => this.setState({username: target.value})}
+            />
+            <Input
+              type="text"
+              placeholder="Email"
+              value={this.state.email}
+              error={checkEmail(this.state.email) ? '' : 'Invalid email'}
+              forceError={this.state.forceError}
+              onChange={({target}) => this.setState({email: target.value})}
+            />
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+              <b>SAVE</b>
+            </Button>
+          </form>
           <Divider />
           <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} href="/change_password">
             <b>CHANGE PASSWORD</b>

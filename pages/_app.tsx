@@ -5,23 +5,23 @@ import axios from 'axios'
 
 function MyApp({ Component, pageProps }) {
   const [user, setUser] = useState()
-  const [update, setUpdate] = useState(false)
 
   useEffect(() => {
     axios.get('/api/user').then(({data}) => {
       setUser(data.user)
     })
-  }, [update])
+  }, [])
 
   return (
     <>
-      <Component {...pageProps} user={user} updateUser={() => setUpdate(!update)} />
+      <Component {...pageProps} user={user} setUser={setUser} />
       <Toaster
         reverseOrder
         toastOptions={{
           style: {
             backgroundColor: '#151208',
-            color: '#d5d5d5'
+            color: '#d5d5d5',
+            fontSize: '1.2rem'
           }
         }}
       />

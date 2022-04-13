@@ -5,11 +5,52 @@ import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
-import Divider from '../components/Divider'
+import {checkPassword, checkPasswords, passwordErrorMessage, preventDefault} from '../lib/util'
+import {toast} from 'react-hot-toast'
+import axios from 'axios'
+import {Router, withRouter} from 'next/router'
 
-export default class ChangePassword extends Component {
-  props: {
-    user: User
+interface Props {
+  user: User
+  router: Router
+}
+
+class ChangePassword extends Component<Props> {
+  state: {
+    password: string
+    newPassword: string
+    newPasswordRepeat: string
+    forceError: boolean
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      password: '',
+      newPassword: '',
+      newPasswordRepeat: '',
+      forceError: false
+    }
+  }
+
+  changePassword() {
+    if(checkPassword(this.state.newPassword) && checkPasswords(this.state.newPassword, this.state.newPasswordRepeat)) {
+      toast.promise(axios.post('/api/user/change_password', {password: this.state.password, newPassword: this.state.newPassword, newPasswordRepeat: this.state.newPasswordRepeat}), {
+        loading: 'Changing password...',
+        success: () => {
+          this.props.router.push('/profile')
+          return 'Password successfully changed'
+        },
+        error: 'Invalid password'
+      })
+    }
+    else {
+      toast.error('There are errors in form')
+      this.setState({
+        forceError: true
+      })
+    }
   }
 
   render() {
@@ -22,14 +63,37 @@ export default class ChangePassword extends Component {
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="password" placeholder="Current password" />
-          <Input type="password" placeholder="New password" />
-          <Input type="password" placeholder="Repeat password" />
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
-            <b>CHANGE PASSWORD</b>
-          </Button>
+          <form onSubmit={preventDefault(() => this.changePassword())}>
+            <Input
+              type="password"
+              placeholder="Current password"
+              value={this.state.password}
+              onChange={({target}) => this.setState({password: target.value})}
+            />
+            <Input
+              type="password"
+              placeholder="New password"
+              value={this.state.newPassword}
+              error={passwordErrorMessage(this.state.newPassword)}
+              forceError={this.state.forceError}
+              onChange={({target}) => this.setState({newPassword: target.value})}
+            />
+            <Input
+              type="password"
+              placeholder="Repeat password"
+              value={this.state.newPasswordRepeat}
+              error={checkPasswords(this.state.newPassword, this.state.newPasswordRepeat) ? '' : 'Passwords are not equal'}
+              forceError={this.state.forceError}
+              onChange={({target}) => this.setState({newPasswordRepeat: target.value})}
+            />
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+              <b>CHANGE PASSWORD</b>
+            </Button>
+          </form>
         </CenteredContent>
       </div>
     )
   }
 }
+
+export default withRouter(ChangePassword)
