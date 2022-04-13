@@ -8,9 +8,11 @@ import User from '../../objects/User'
 import Input from '../../components/Input'
 import Checkbox from '../../components/Checkbox'
 import axios from 'axios'
+import {renderLoading} from '../../lib/util'
 
 interface Props {
   user: User
+  userLoaded: boolean
   router: NextRouter
 }
 
@@ -27,6 +29,15 @@ class CreateRoom extends Component<Props> {
   }
 
   render() {
+    if(!this.props.userLoaded) {
+      return renderLoading()
+    }
+
+    if(!this.props.user) {
+      this.props.router.push('/sign_in')
+      return renderLoading()
+    }
+
     return (
       <div>
         <Head>

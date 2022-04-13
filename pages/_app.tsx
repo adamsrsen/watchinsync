@@ -5,16 +5,18 @@ import axios from 'axios'
 
 function MyApp({ Component, pageProps }) {
   const [user, setUser] = useState()
+  const [userLoaded, setLoaded] = useState(false)
 
   useEffect(() => {
     axios.get('/api/user').then(({data}) => {
       setUser(data.user)
+      setLoaded(true)
     })
   }, [])
 
   return (
     <>
-      <Component {...pageProps} user={user} setUser={setUser} />
+      <Component {...pageProps} user={user} setUser={setUser} userLoaded={userLoaded} />
       <Toaster
         reverseOrder
         toastOptions={{

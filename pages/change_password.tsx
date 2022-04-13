@@ -5,13 +5,14 @@ import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
-import {checkPassword, checkPasswords, passwordErrorMessage, preventDefault} from '../lib/util'
+import {checkPassword, checkPasswords, passwordErrorMessage, preventDefault, renderLoading} from '../lib/util'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
 
 interface Props {
   user: User
+  userLoaded: boolean
   router: Router
 }
 
@@ -54,6 +55,15 @@ class ChangePassword extends Component<Props> {
   }
 
   render() {
+    if(!this.props.userLoaded) {
+      return renderLoading()
+    }
+
+    if(!this.props.user) {
+      this.props.router.push('/sign_in')
+      return renderLoading()
+    }
+
     return (
       <div>
         <Head>

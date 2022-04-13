@@ -9,7 +9,7 @@ import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
-import {preventDefault} from '../lib/util'
+import {preventDefault, renderLoading} from '../lib/util'
 
 interface Props {
   user: User
@@ -37,7 +37,6 @@ class SignIn extends Component<Props> {
       loading: 'Signing in...',
       success: ({data}) => {
         this.props.setUser(data)
-        this.props.router.push('/')
         return 'Successfully signed in'
       },
       error: 'Invalid credentials'
@@ -45,6 +44,10 @@ class SignIn extends Component<Props> {
   }
 
   render() {
+    if(this.props.user) {
+      this.props.router.push('/')
+    }
+
     return (
       <div>
         <Head>

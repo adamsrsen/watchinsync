@@ -64,6 +64,10 @@ class SignUp extends Component<Props> {
   }
 
   render() {
+    if(this.props.user) {
+      this.props.router.push('/')
+    }
+
     return (
       <div>
         <Head>

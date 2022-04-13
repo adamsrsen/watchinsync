@@ -8,17 +8,28 @@ import List from '../../components/List'
 import Item from '../../components/Item'
 import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
 import styles from '../../styles/Rooms.module.scss'
+import {renderLoading} from '../../lib/util'
+import {Router, withRouter} from 'next/router'
+import Room from '../../objects/Room'
 
-export default class MyRooms extends Component {
-  props: {
-    user: User
-    rooms: [{
-      id: string
-      name: string
-    }]
-  }
+interface Props {
+  user: User
+  userLoaded: boolean
+  rooms: Room[]
+  router: Router
+}
 
+class MyRooms extends Component<Props> {
   render() {
+    if(!this.props.userLoaded) {
+      return renderLoading()
+    }
+
+    if(!this.props.user) {
+      this.props.router.push('/sign_in')
+      return renderLoading()
+    }
+
     return (
       <div>
         <Head>
@@ -52,3 +63,5 @@ export default class MyRooms extends Component {
     )
   }
 }
+
+export default withRouter(MyRooms)

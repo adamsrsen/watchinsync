@@ -6,17 +6,20 @@ import Input from '../components/Input'
 import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
 import Divider from '../components/Divider'
-import {checkEmail, checkUsername, preventDefault} from '../lib/util'
+import {checkEmail, checkUsername, preventDefault, renderLoading} from '../lib/util'
 import _ from 'lodash'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
+import {Router, withRouter} from 'next/router'
 
 interface Props {
   user: User
   setUser: Function
+  userLoaded: boolean
+  router: Router
 }
 
-export default class Profile extends Component<Props> {
+class Profile extends Component<Props> {
   state: {
     username: string
     email: string
@@ -62,6 +65,15 @@ export default class Profile extends Component<Props> {
   }
 
   render() {
+    if(!this.props.userLoaded) {
+      return renderLoading()
+    }
+
+    if(!this.props.user) {
+      this.props.router.push('/sign_in')
+      return renderLoading()
+    }
+
     return (
       <div>
         <Head>
@@ -100,3 +112,5 @@ export default class Profile extends Component<Props> {
     )
   }
 }
+
+export default withRouter(Profile)

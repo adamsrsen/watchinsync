@@ -1,4 +1,10 @@
 import {decode, encode} from 'uuid-base64-ts'
+import Head from 'next/head'
+import Header from '../components/Header'
+import CenteredContent from '../components/CenteredContent'
+import Input from '../components/Input'
+import Checkbox from '../components/Checkbox'
+import Button, {ButtonSize, ButtonWidth} from '../components/Button'
 
 const MIN_PASSWORD_LEN = 8
 const MAX_PASSWORD_LEN = 24
@@ -54,4 +60,20 @@ export const checkPassword = (password: string) => {
 
 export const checkPasswords = (password: string, passwordRepeat: string) => {
   return password === passwordRepeat
+}
+
+export const renderLoading = () => {
+  return (
+    <div>
+      <Head>
+        <title>Create room - WatchInSync</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <Header/>
+      <CenteredContent>
+        <h2>Loading...</h2>
+      </CenteredContent>
+    </div>
+  )
 }

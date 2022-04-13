@@ -6,7 +6,7 @@ import styles from './Header.module.scss'
 
 export default class Header extends Component {
   props: {
-    user: User
+    user?: User
   }
 
   render() {
