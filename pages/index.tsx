@@ -40,7 +40,7 @@ export default class Home extends Component {
           {this.props.user && (
             <>
               <Divider />
-              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/my">
+              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/my/1">
                 <b>MY ROOMS</b>
               </Button>
             </>

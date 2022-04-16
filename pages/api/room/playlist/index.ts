@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     catch(e) {
       return res.status(400).send('roomId has invalid format')
     }
+
     const connection = await getConnection()
     const playlist = await connection
       .getRepository<Videos>('Videos')
@@ -25,6 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.send(playlist)
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }

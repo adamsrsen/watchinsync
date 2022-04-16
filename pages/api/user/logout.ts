@@ -8,7 +8,7 @@ const login = async function(req: NextApiRequest, res: NextApiResponse) {
     res.redirect('/')
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }
 

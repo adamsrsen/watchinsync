@@ -82,6 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
     }
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }

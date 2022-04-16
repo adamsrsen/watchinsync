@@ -18,18 +18,19 @@ import {NextRouter, withRouter} from 'next/router'
 interface Props {
   user: User
   rooms: Room[]
+  pages: number
   router: NextRouter
 }
 
 class RoomsPage extends Component<Props> {
   renderRoomList() {
     if(this.props.router.isFallback) {
-      return <h2>Loading...</h2>
+      return <h2 className="text-center">Loading...</h2>
     }
 
     return (
       <List>
-        {this.props.rooms?.map((room) => (
+        {this.props.pages ? this.props.rooms?.map((room) => (
           <Item key={room.id}>
             <div className={styles.room}>
               <span>{room.name}</span>
@@ -38,7 +39,7 @@ class RoomsPage extends Component<Props> {
               </Button>
             </div>
           </Item>
-        )) || (
+        )) : (
           <Item>
             <p className="center">
               There are no public rooms, so <Link href="/sign_up"><a className="link">sign up</a></Link> and create one
@@ -97,13 +98,20 @@ export async function getStaticProps({params}) {
     .limit(25)
     .offset((parseInt(page) - 1) * 25)
     .getMany()
+  const roomCount = await connection
+    .getRepository<Rooms>('Rooms')
+    .createQueryBuilder('room')
+    .select(['room.id', 'room.name'])
+    .where('room.public = :public', {public: true})
+    .getCount()
 
   return {
     props: {
       rooms: rooms.map((room) => ({
         id: encode(room.id),
         name: room.name
-      }))
+      })),
+      pages: Math.ceil(roomCount / 25)
     }
   }
 }

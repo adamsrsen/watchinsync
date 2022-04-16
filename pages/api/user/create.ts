@@ -4,7 +4,7 @@ import {promisify} from 'util'
 import getConnection from '../../../lib/db'
 import Users from '../../../entity/Users'
 import bcrypt from 'bcrypt'
-import {checkEmail, checkPassword, checkPasswords, checkUsername} from '../../../lib/util'
+import {checkEmail, checkPassword, checkPasswords, checkUsername} from '../../../lib/verify'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST') {
@@ -46,6 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }

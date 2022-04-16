@@ -6,7 +6,7 @@ import Users from '../../../entity/Users'
 import bcrypt from 'bcrypt'
 import {sessionOptions} from '../../../lib/session'
 import {withIronSessionApiRoute} from 'iron-session/next'
-import {checkPassword, checkPasswords} from '../../../lib/util'
+import {checkPassword, checkPasswords} from '../../../lib/verify'
 
 const changePassword = async function(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST') {
@@ -48,7 +48,7 @@ const changePassword = async function(req: NextApiRequest, res: NextApiResponse)
     }
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }
 

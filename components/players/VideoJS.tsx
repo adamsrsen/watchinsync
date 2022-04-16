@@ -2,7 +2,6 @@ import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import Player, {PlaybackState} from './Player'
 import {createRef, RefObject} from 'react'
-import {getCookie} from '../../lib/util'
 
 export default class VideoJS extends Player {
   videoRef: RefObject<any>
@@ -38,12 +37,12 @@ export default class VideoJS extends Player {
       this.player = videojs(this.videoRef.current, {
         fluid: true
       }, () => {
-        this.player.volume(getCookie('volume'))
+        this.player.volume(window.localStorage.getItem('volume'))
       })
 
       // Save current volume and set it in future VideoJS players
       this.player.on('volumechange', () => {
-        document.cookie = `volume=${this.player.volume()}; max-age=${365 * 24 * 60 * 60}; path=/`
+        window.localStorage.setItem('volume', this.player.volume())
       })
       // Listen to play event and send socket if it was user input
       this.player.on('play', () => {

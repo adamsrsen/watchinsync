@@ -14,9 +14,9 @@ import {
   checkPassword,
   checkPasswords,
   checkUsername,
-  passwordErrorMessage,
-  preventDefault
-} from '../lib/util'
+  passwordErrorMessage
+} from '../lib/verify'
+import {preventDefault} from '../lib/util'
 
 interface Props {
   user: User

@@ -8,7 +8,7 @@ import User from '../../objects/User'
 import Input from '../../components/Input'
 import Checkbox from '../../components/Checkbox'
 import axios from 'axios'
-import {renderLoading} from '../../lib/util'
+import {preventDefault, renderLoading} from '../../lib/util'
 
 interface Props {
   user: User
@@ -47,13 +47,15 @@ class CreateRoom extends Component<Props> {
 
         <Header user={this.props.user}/>
         <CenteredContent width={600}>
-          <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
-          <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
-            Public
-          </Checkbox>
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} onClick={() => this.createRoom()}>
-            <b>CREATE ROOM</b>
-          </Button>
+          <form onSubmit={preventDefault(() => this.createRoom())}>
+            <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+            <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
+              Public
+            </Checkbox>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+              <b>CREATE ROOM</b>
+            </Button>
+          </form>
         </CenteredContent>
       </div>
     )

@@ -3,6 +3,7 @@ import Users from './Users'
 import Rooms from './Rooms'
 
 export enum UserRole {
+  OWNER,
   ADMIN,
   MODERATOR,
   MEMBER

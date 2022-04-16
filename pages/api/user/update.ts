@@ -3,10 +3,9 @@ import bodyParser from 'body-parser'
 import {promisify} from 'util'
 import getConnection from '../../../lib/db'
 import Users from '../../../entity/Users'
-import bcrypt from 'bcrypt'
 import {sessionOptions} from '../../../lib/session'
 import {withIronSessionApiRoute} from 'iron-session/next'
-import {checkEmail, checkUsername} from '../../../lib/util'
+import {checkEmail, checkUsername} from '../../../lib/verify'
 
 const update = async function(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST') {
@@ -52,7 +51,7 @@ const update = async function(req: NextApiRequest, res: NextApiResponse) {
     }
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }
 

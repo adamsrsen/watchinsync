@@ -32,6 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
   else {
-    res.status(404).send('')
+    res.status(405).end()
   }
 }

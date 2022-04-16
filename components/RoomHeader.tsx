@@ -4,6 +4,7 @@ import Image from 'next/image'
 import styles from './RoomHeader.module.scss'
 import Room from '../objects/Room'
 import axios from 'axios'
+import {preventDefault} from '../lib/util'
 
 interface Props {
   room?: Room
@@ -42,10 +43,10 @@ export default class RoomHeader extends Component<Props> {
           </Link>
           <h1>{this.props.room?.name}</h1>
         </div>
-        <div className={[styles['header-group'], styles['header-input']].join(' ')}>
+        <form className={[styles['header-group'], styles['header-input']].join(' ')} onSubmit={preventDefault(() => this.addVideo())}>
           <input placeholder="Videos url (https://example.com/video.mp4)" value={this.state.videoLink} onChange={(e) => this.setState({videoLink: e.target.value})} />
-          <button onClick={() => this.addVideo()}>Add</button>
-        </div>
+          <button>Add</button>
+        </form>
         <div className={styles['header-group']}>
           <span className={[styles['header-link'], styles['header-text']].join(' ')}>
             Settings

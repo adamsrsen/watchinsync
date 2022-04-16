@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn} from 'typeorm'
 import Users from './Users'
 import Roles from './Roles'
 import Permissions from './Permissions'
@@ -23,12 +23,15 @@ export default class Rooms {
   roles: Partial<Roles[]>
 
   @OneToOne(() => Permissions)
+  @JoinColumn()
   admin_permissions: Partial<Permissions>
 
   @OneToOne(() => Permissions)
+  @JoinColumn()
   moderator_permissions: Partial<Permissions>
 
   @OneToOne(() => Permissions)
+  @JoinColumn()
   member_permissions: Partial<Permissions>
 
   @OneToMany(() => Videos, (video) => video.room)
