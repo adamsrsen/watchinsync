@@ -7,6 +7,7 @@ import styles from './Playlist.module.scss'
 import Room from '../objects/Room'
 import axios from 'axios'
 import Dropdown from './Dropdown'
+import {toast} from 'react-hot-toast'
 
 interface Props {
   room: Room
@@ -28,15 +29,19 @@ export default class Playlist extends Component<Props> {
                 <Dropdown options={[
                   {
                     title: 'Remove',
-                    onClick: () => {
-                      axios.post('/api/room/playlist/remove', {roomId: this.props.room.id, videoId: video.id}).then(() => {}).catch((e) => {})
-                    }
+                    onClick: () => toast.promise(axios.post('/api/room/playlist/remove', {roomId: this.props.room.id, videoId: video.id}), {
+                      loading: 'Removing video...',
+                      success: 'Video successfully removed',
+                      error: 'Error occurred please try again later'
+                    })
                   },
                   {
                     title: 'Skip',
-                    onClick: () => {
-                      axios.post('/api/room/playlist/skip', {roomId: this.props.room.id, videoId: video.id, delay: 0}).then(() => {}).catch((e) => {})
-                    }
+                    onClick: () => toast.promise(axios.post('/api/room/playlist/skip', {roomId: this.props.room.id, videoId: video.id}), {
+                      loading: 'Skipping video...',
+                      success: 'Video successfully skipped',
+                      error: 'Error occurred please try again later'
+                    })
                   }
                 ]}>
                   <Image src="/more.svg" width={24} height={24} />

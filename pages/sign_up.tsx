@@ -5,7 +5,7 @@ import Header from '../components/Header'
 import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
-import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import axios from 'axios'
 import {NextRouter, withRouter} from 'next/router'
 import {toast} from 'react-hot-toast'
@@ -20,6 +20,7 @@ import {preventDefault} from '../lib/util'
 
 interface Props {
   user: User
+  setUser: Function
   router: NextRouter
 }
 
@@ -75,7 +76,7 @@ class SignUp extends Component<Props> {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user}/>
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <CenteredContent width={600}>
           <form onSubmit={preventDefault(() => this.signUp())}>
             <Input
@@ -110,7 +111,7 @@ class SignUp extends Component<Props> {
               forceError={this.state.forceError}
               onChange={({target}) => this.setState({passwordRepeat: target.value})}
             />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
               <b>SIGN UP</b>
             </Button>
           </form>

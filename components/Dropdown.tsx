@@ -1,4 +1,5 @@
 import {Component, MouseEventHandler, ReactNode} from 'react'
+import {motion} from 'framer-motion'
 import Link from 'next/link'
 import styles from './Dropdown.module.scss'
 import List from './List'
@@ -59,23 +60,52 @@ export default class Dropdown extends Component<Props> {
     return (
       <div className={styles.dropdown} onClick={() => this.toggle()}>
         {this.props.children}
-        <div className={`${styles['dropdown-items']}${this.state.opened ? ` ${styles['opened']}` : ''}`}>
-          <List>
-            {this.props.options.map((option, index) => (
-              <Item key={index}>
-                <div onClick={option.onClick}>
-                  {option.href ? (
-                    <Link href={option.href}>
-                      <a>
-                        {option.title}
-                      </a>
-                    </Link>
-                  ) : option.title}
-                </div>
-              </Item>
-            ))}
-          </List>
-        </div>
+        <motion.div
+          initial={'close'}
+          animate={this.state.opened ? 'open' : 'close'}
+          variants={{
+            open: {
+              display: 'block',
+            },
+            close: {
+              display: 'none',
+              transition: {
+                when: 'afterChildren'
+              }
+            }
+          }}
+        >
+          <motion.div
+            className={styles['dropdown-items']}
+            variants={{
+              open: {
+                opacity: 1
+              },
+              close: {
+                opacity: 0
+              }
+            }}
+            transition={{
+              duration: .1
+            }}
+          >
+            <List>
+              {this.props.options.map((option, index) => (
+                <Item key={index}>
+                  <div onClick={option.onClick}>
+                    {option.href ? (
+                      <Link href={option.href}>
+                        <a>
+                          {option.title}
+                        </a>
+                      </Link>
+                    ) : option.title}
+                  </div>
+                </Item>
+              ))}
+            </List>
+          </motion.div>
+        </motion.div>
       </div>
     )
   }

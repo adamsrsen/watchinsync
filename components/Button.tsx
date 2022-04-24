@@ -14,23 +14,32 @@ export const ButtonWidth = {
   fullwidth: styles['button-fullwidth'],
 } as const
 
+type ButtonColor = typeof ButtonWidth[keyof typeof ButtonWidth]
+export const ButtonColor = {
+  primary: styles.primary,
+  secondary: styles.secondary,
+} as const
+
 interface Props {
   size: ButtonSize,
   width: ButtonWidth,
+  color: ButtonColor,
   href?: string,
   onClick?: MouseEventHandler<HTMLButtonElement>
 }
 
 export default class Button extends Component<Props> {
   render() {
+    const classes = [styles.button, this.props.size, this.props.width, this.props.color]
+
     return this.props.href ? (
       <Link href={this.props.href}>
-        <a className={[styles.button, this.props.size, this.props.width].join(' ')}>
+        <a className={classes.join(' ')}>
           {this.props.children}
         </a>
       </Link>
     ) : (
-      <button className={[styles.button, this.props.size, this.props.width].join(' ')} onClick={this.props.onClick}>
+      <button className={classes.join(' ')} onClick={this.props.onClick}>
         {this.props.children}
       </button>
     )

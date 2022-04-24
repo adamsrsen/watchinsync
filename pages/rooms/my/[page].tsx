@@ -6,7 +6,7 @@ import User from '../../../objects/User'
 import Container from '../../../components/Container'
 import List from '../../../components/List'
 import Item from '../../../components/Item'
-import Button, {ButtonSize, ButtonWidth} from '../../../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../../../components/Button'
 import styles from '../../../styles/Rooms.module.scss'
 import {renderLoading} from '../../../lib/util'
 import Room from '../../../objects/Room'
@@ -18,6 +18,7 @@ import {encode} from 'uuid-base64-ts'
 
 interface Props {
   user: User
+  setUser: Function
   userLoaded: boolean
   rooms: Room[]
   pages: number
@@ -36,7 +37,7 @@ export default class MyRooms extends Component<Props> {
           <link rel="icon" href="/favicon.ico"/>
         </Head>
 
-        <Header user={this.props.user} />
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <Container>
           <h2 className="title">My rooms</h2>
           <List>
@@ -44,7 +45,7 @@ export default class MyRooms extends Component<Props> {
               <Item key={room.id}>
                 <div className={styles.room}>
                   <span>{room.name}</span>
-                  <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${encodeURIComponent(room.id)}`}>
+                  <Button size={ButtonSize.small} width={ButtonWidth.normal} color={ButtonColor.primary} href={`/room/${encodeURIComponent(room.id)}`}>
                     <b>JOIN</b>
                   </Button>
                 </div>

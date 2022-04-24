@@ -4,10 +4,12 @@ import CenteredContent from '../components/CenteredContent'
 import Header from '../components/Header'
 import User from '../objects/User'
 
-export default class Error404 extends Component {
-  props: {
-    user: User
-  }
+interface Props {
+  user: User
+  setUser: Function
+}
+
+export default class Error404 extends Component<Props> {
 
   render() {
     return (
@@ -17,7 +19,7 @@ export default class Error404 extends Component {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user} />
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <CenteredContent>
           <h2 className="title">404</h2>
           <p>Page not found</p>

@@ -4,14 +4,15 @@ import Link from 'next/link'
 import Header from '../components/Header'
 import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
-import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import Divider from '../components/Divider'
 
-export default class Home extends Component {
-  props: {
-    user: User
-  }
+interface Props {
+  user: User
+  setUser: Function
+}
 
+export default class Home extends Component<Props> {
   render() {
     return (
       <div>
@@ -20,11 +21,11 @@ export default class Home extends Component {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user} />
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <CenteredContent>
           {this.props.user ? (
             <>
-              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/room/create">
+              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/room/create">
                 <b>CREATE ROOM</b>
               </Button>
               <Divider />
@@ -34,13 +35,13 @@ export default class Home extends Component {
               If you want to create your own rooms <Link href="/sign_up"><a className="link">sign up</a></Link>
             </p>
           )}
-          <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/page/1">
+          <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/rooms/page/1">
             <b>BROWSE ROOMS</b>
           </Button>
           {this.props.user && (
             <>
               <Divider />
-              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} href="/rooms/my/1">
+              <Button size={ButtonSize.large} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/rooms/my/1">
                 <b>MY ROOMS</b>
               </Button>
             </>

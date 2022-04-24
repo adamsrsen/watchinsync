@@ -3,15 +3,17 @@ import Head from 'next/head'
 import {NextRouter, withRouter} from 'next/router'
 import Header from '../../components/Header'
 import CenteredContent from '../../components/CenteredContent'
-import Button, {ButtonSize, ButtonWidth} from '../../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../../components/Button'
 import User from '../../objects/User'
 import Input from '../../components/Input'
 import Checkbox from '../../components/Checkbox'
 import axios from 'axios'
 import {preventDefault, renderLoading} from '../../lib/util'
+import {toast} from 'react-hot-toast'
 
 interface Props {
   user: User
+  setUser: Function
   userLoaded: boolean
   router: NextRouter
 }
@@ -23,8 +25,13 @@ class CreateRoom extends Component<Props> {
   }
 
   createRoom() {
-    axios.post('/api/room/create', {...this.state}).then((res) => {
-      this.props.router.push(`/room/${encodeURIComponent(res.data.id)}`)
+    toast.promise(axios.post('/api/room/create', {...this.state}), {
+      loading: 'Creating room...',
+      success: (res) => {
+        this.props.router.push(`/room/${encodeURIComponent(res.data.id)}`)
+        return 'Room successfully created'
+      },
+      error: 'Error occurred please try again later'
     })
   }
 
@@ -45,14 +52,14 @@ class CreateRoom extends Component<Props> {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user}/>
+        <Header user={this.props.user} setUser={this.props.setUser}/>
         <CenteredContent width={600}>
           <form onSubmit={preventDefault(() => this.createRoom())}>
             <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
             <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
               Public
             </Checkbox>
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
               <b>CREATE ROOM</b>
             </Button>
           </form>

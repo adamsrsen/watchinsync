@@ -3,7 +3,7 @@ import styles from './Input.module.scss'
 
 interface Props {
   type: string
-  placeholder: string
+  placeholder?: string
   value?: string
   error?: string
   forceError?: boolean

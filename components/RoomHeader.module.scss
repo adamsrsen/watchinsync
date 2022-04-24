@@ -70,4 +70,23 @@
     border-bottom: solid $light-primary .25rem;
     transform: rotate(45deg);
   }
+
+  table {
+    width: 100%;
+
+    td, th {
+      width: 25%;
+    }
+
+    .checkbox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      label {
+        width: auto;
+        margin: .25rem 0 !important;
+      }
+    }
+  }
 }

@@ -5,17 +5,12 @@
   cursor: pointer;
 
   .dropdown-items {
-    display: none;
     position: absolute;
     top: 100%;
     right: 0;
     background-color: $dark-primary;
     box-shadow: 0 0 .5rem 0 #000;
     z-index: 999;
-
-    &.opened {
-      display: block;
-    }
 
     li {
       padding: 1rem;

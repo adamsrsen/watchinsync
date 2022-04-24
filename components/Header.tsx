@@ -3,10 +3,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import User from '../objects/User'
 import styles from './Header.module.scss'
+import axios from 'axios'
 
-export default class Header extends Component {
-  props: {
-    user?: User
+interface Props {
+  user: User
+  setUser: Function
+}
+
+export default class Header extends Component<Props> {
+  logout() {
+    axios.get('/api/user/logout').then(() => {
+      this.props.setUser(null)
+    }).catch((e) => {})
   }
 
   render() {
@@ -28,11 +36,9 @@ export default class Header extends Component {
                   {this.props.user.username}
                 </a>
               </Link>
-              <Link href="/api/user/logout">
-                <a className={[styles['header-link'], styles['header-text']].join(' ')}>
-                  Sign out
-                </a>
-              </Link>
+              <a className={[styles['header-link'], styles['header-text']].join(' ')} onClick={() => this.logout()}>
+                Sign out
+              </a>
             </>
           ) : (
             <>

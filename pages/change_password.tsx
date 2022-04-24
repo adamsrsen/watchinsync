@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
-import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
 import {checkPassword, checkPasswords, passwordErrorMessage} from '../lib/verify'
 import {preventDefault, renderLoading} from '../lib/util'
@@ -13,6 +13,7 @@ import {Router, withRouter} from 'next/router'
 
 interface Props {
   user: User
+  setUser: Function
   userLoaded: boolean
   router: Router
 }
@@ -72,7 +73,7 @@ class ChangePassword extends Component<Props> {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user}/>
+        <Header user={this.props.user} setUser={this.props.setUser}/>
         <CenteredContent width={600}>
           <form onSubmit={preventDefault(() => this.changePassword())}>
             <Input
@@ -97,7 +98,7 @@ class ChangePassword extends Component<Props> {
               forceError={this.state.forceError}
               onChange={({target}) => this.setState({newPasswordRepeat: target.value})}
             />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
               <b>CHANGE PASSWORD</b>
             </Button>
           </form>

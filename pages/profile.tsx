@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
-import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import User from '../objects/User'
 import Divider from '../components/Divider'
 import {preventDefault, renderLoading} from '../lib/util'
@@ -82,7 +82,7 @@ class Profile extends Component<Props> {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user}/>
+        <Header user={this.props.user} setUser={this.props.setUser}/>
         <CenteredContent width={600}>
           <form onSubmit={preventDefault(() => this.save())}>
             <Input
@@ -100,12 +100,12 @@ class Profile extends Component<Props> {
               forceError={this.state.forceError}
               onChange={({target}) => this.setState({email: target.value})}
             />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
               <b>SAVE</b>
             </Button>
           </form>
           <Divider />
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} href="/change_password">
+          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/change_password">
             <b>CHANGE PASSWORD</b>
           </Button>
         </CenteredContent>

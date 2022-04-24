@@ -5,7 +5,7 @@ import Header from '../components/Header'
 import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
 import Input from '../components/Input'
-import Button, {ButtonSize, ButtonWidth} from '../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
@@ -55,7 +55,7 @@ class SignIn extends Component<Props> {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Header user={this.props.user}/>
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <CenteredContent width={600}>
           <form onSubmit={preventDefault(() => this.login())}>
             <Input
@@ -70,7 +70,7 @@ class SignIn extends Component<Props> {
               value={this.state.password}
               onChange={({target}) => this.setState({password: target.value})}
             />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth}>
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
               <b>SIGN IN</b>
             </Button>
           </form>

@@ -6,7 +6,7 @@ import User from '../../../objects/User'
 import Container from '../../../components/Container'
 import List from '../../../components/List'
 import Item from '../../../components/Item'
-import Button, {ButtonSize, ButtonWidth} from '../../../components/Button'
+import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../../../components/Button'
 import styles from '../../../styles/Rooms.module.scss'
 import Input from '../../../components/Input'
 import getConnection from '../../../lib/db'
@@ -17,6 +17,7 @@ import {NextRouter, withRouter} from 'next/router'
 
 interface Props {
   user: User
+  setUser: Function
   rooms: Room[]
   pages: number
   router: NextRouter
@@ -34,7 +35,7 @@ class RoomsPage extends Component<Props> {
           <Item key={room.id}>
             <div className={styles.room}>
               <span>{room.name}</span>
-              <Button size={ButtonSize.small} width={ButtonWidth.normal} href={`/room/${encodeURIComponent(room.id)}`}>
+              <Button size={ButtonSize.small} width={ButtonWidth.normal} color={ButtonColor.primary} href={`/room/${encodeURIComponent(room.id)}`}>
                 <b>JOIN</b>
               </Button>
             </div>
@@ -58,7 +59,7 @@ class RoomsPage extends Component<Props> {
           <link rel="icon" href="/favicon.ico"/>
         </Head>
 
-        <Header user={this.props.user} />
+        <Header user={this.props.user} setUser={this.props.setUser} />
         <Container>
           <h2 className="title">Browse rooms</h2>
           <Input type="text" placeholder="Search..." />
@@ -86,7 +87,6 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({params}) {
   const {page} = params
-  console.log(typeof ((parseInt(page) - 1) * 25))
 
   const connection = await getConnection()
   const rooms = await connection

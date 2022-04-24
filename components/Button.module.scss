@@ -2,7 +2,6 @@
 
 .button {
   color: $light-primary;
-  background-color: $color-primary;
   border: none;
   margin: 1rem 0;
   text-align: center;
@@ -10,7 +9,6 @@
   transition: all .15s ease-in;
 
   &:hover {
-    background-color: $color-secondary;
     color: $light-secondary;
   }
 
@@ -28,5 +26,19 @@
 
   &.button-fullwidth {
     width: 100%;
+  }
+
+  &.primary {
+    background-color: $color-primary;
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+
+  &.secondary {
+    background-color: $error;
+    &:hover {
+      background-color: darken($error, 25);
+    }
   }
 }

@@ -7,7 +7,8 @@ import Rooms from '../../../entity/Rooms'
 import {encode} from 'uuid-base64-ts'
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '../../../lib/session'
-import Roles, {UserRole} from '../../../entity/Roles'
+import Roles from '../../../entity/Roles'
+import {UserRole} from '../../../objects/UserRole'
 import Permissions from '../../../entity/Permissions'
 import Users from '../../../entity/Users'
 
@@ -106,7 +107,6 @@ async function createRoom(req: NextApiRequest, res: NextApiResponse) {
       res.send({id: encode(id)})
     }
     catch(e) {
-      console.log(e)
       res.status(400).send('database error')
     }
   }

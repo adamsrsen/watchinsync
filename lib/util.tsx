@@ -25,7 +25,7 @@ export const renderLoading = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header/>
+      <Header />
       <CenteredContent>
         <h2>Loading...</h2>
       </CenteredContent>
