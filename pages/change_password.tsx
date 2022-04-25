@@ -10,6 +10,7 @@ import {preventDefault, renderLoading} from '../lib/util'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
+import AnimatePage from '../components/AnimatePage'
 
 interface Props {
   user: User
@@ -74,35 +75,37 @@ class ChangePassword extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser}/>
-        <CenteredContent width={600}>
-          <form onSubmit={preventDefault(() => this.changePassword())}>
-            <Input
-              type="password"
-              placeholder="Current password"
-              value={this.state.password}
-              onChange={({target}) => this.setState({password: target.value})}
-            />
-            <Input
-              type="password"
-              placeholder="New password"
-              value={this.state.newPassword}
-              error={passwordErrorMessage(this.state.newPassword)}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({newPassword: target.value})}
-            />
-            <Input
-              type="password"
-              placeholder="Repeat password"
-              value={this.state.newPasswordRepeat}
-              error={checkPasswords(this.state.newPassword, this.state.newPasswordRepeat) ? '' : 'Passwords are not equal'}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({newPasswordRepeat: target.value})}
-            />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
-              <b>CHANGE PASSWORD</b>
-            </Button>
-          </form>
-        </CenteredContent>
+        <AnimatePage>
+          <CenteredContent width={600}>
+            <form onSubmit={preventDefault(() => this.changePassword())}>
+              <Input
+                type="password"
+                placeholder="Current password"
+                value={this.state.password}
+                onChange={({target}) => this.setState({password: target.value})}
+              />
+              <Input
+                type="password"
+                placeholder="New password"
+                value={this.state.newPassword}
+                error={passwordErrorMessage(this.state.newPassword)}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({newPassword: target.value})}
+              />
+              <Input
+                type="password"
+                placeholder="Repeat password"
+                value={this.state.newPasswordRepeat}
+                error={checkPasswords(this.state.newPassword, this.state.newPasswordRepeat) ? '' : 'Passwords are not equal'}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({newPasswordRepeat: target.value})}
+              />
+              <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
+                <b>CHANGE PASSWORD</b>
+              </Button>
+            </form>
+          </CenteredContent>
+        </AnimatePage>
       </div>
     )
   }

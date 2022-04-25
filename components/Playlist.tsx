@@ -18,8 +18,8 @@ export default class Playlist extends Component<Props> {
   render() {
     return (
       <List>
-        {this.props.playlist.map((video) => (
-          <Item key={video.id}>
+        {this.props.playlist.map((video, index) => (
+          <Item key={video.id} index={index}>
             <div className={styles.video}>
               <div className={styles['no-overflow']}>
                 <Image src={`/${video.type}.png`} alt={video.type} width={30} height={30} />

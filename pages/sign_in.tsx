@@ -9,7 +9,8 @@ import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
-import {preventDefault, renderLoading} from '../lib/util'
+import {preventDefault} from '../lib/util'
+import AnimatePage from '../components/AnimatePage'
 
 interface Props {
   user: User
@@ -37,6 +38,7 @@ class SignIn extends Component<Props> {
       loading: 'Signing in...',
       success: ({data}) => {
         this.props.setUser(data)
+        this.props.router.push('/')
         return 'Successfully signed in'
       },
       error: 'Invalid credentials'
@@ -44,10 +46,6 @@ class SignIn extends Component<Props> {
   }
 
   render() {
-    if(this.props.user) {
-      this.props.router.push('/')
-    }
-
     return (
       <div>
         <Head>
@@ -56,26 +54,28 @@ class SignIn extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <CenteredContent width={600}>
-          <form onSubmit={preventDefault(() => this.login())}>
-            <Input
-              type="text"
-              placeholder="Email"
-              value={this.state.email}
-              onChange={({target}) => this.setState({email: target.value})}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={this.state.password}
-              onChange={({target}) => this.setState({password: target.value})}
-            />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
-              <b>SIGN IN</b>
-            </Button>
-          </form>
-          <p>Don&#39;t you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
-        </CenteredContent>
+        <AnimatePage>
+          <CenteredContent width={600}>
+            <form onSubmit={preventDefault(() => this.login())}>
+              <Input
+                type="text"
+                placeholder="Email"
+                value={this.state.email}
+                onChange={({target}) => this.setState({email: target.value})}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={this.state.password}
+                onChange={({target}) => this.setState({password: target.value})}
+              />
+              <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
+                <b>SIGN IN</b>
+              </Button>
+            </form>
+            <p>Don&#39;t you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
+          </CenteredContent>
+        </AnimatePage>
       </div>
     )
   }

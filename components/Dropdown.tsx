@@ -91,7 +91,7 @@ export default class Dropdown extends Component<Props> {
           >
             <List>
               {this.props.options.map((option, index) => (
-                <Item key={index}>
+                <Item key={index} index={index}>
                   <div onClick={option.onClick}>
                     {option.href ? (
                       <Link href={option.href}>

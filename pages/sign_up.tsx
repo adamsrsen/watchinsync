@@ -17,6 +17,7 @@ import {
   passwordErrorMessage
 } from '../lib/verify'
 import {preventDefault} from '../lib/util'
+import AnimatePage from '../components/AnimatePage'
 
 interface Props {
   user: User
@@ -77,46 +78,48 @@ class SignUp extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <CenteredContent width={600}>
-          <form onSubmit={preventDefault(() => this.signUp())}>
-            <Input
-              type="text"
-              placeholder="Username"
-              value={this.state.username}
-              error={checkUsername(this.state.username) ? '' : 'Username is required field'}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({username: target.value})}
-            />
-            <Input
-              type="text"
-              placeholder="Email"
-              value={this.state.email}
-              error={checkEmail(this.state.email) ? '' : 'Invalid email'}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({email: target.value})}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={this.state.password}
-              error={passwordErrorMessage(this.state.password)}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({password: target.value})}
-            />
-            <Input
-              type="password"
-              placeholder="Repeat password"
-              value={this.state.passwordRepeat}
-              error={checkPasswords(this.state.password, this.state.passwordRepeat) ? '' : 'Passwords are not equal'}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({passwordRepeat: target.value})}
-            />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
-              <b>SIGN UP</b>
-            </Button>
-          </form>
-          <p>Do you already have account? <Link href="/sign_in"><a className="link">Sign in</a></Link></p>
-        </CenteredContent>
+        <AnimatePage>
+          <CenteredContent width={600}>
+            <form onSubmit={preventDefault(() => this.signUp())}>
+              <Input
+                type="text"
+                placeholder="Username"
+                value={this.state.username}
+                error={checkUsername(this.state.username) ? '' : 'Username is required field'}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({username: target.value})}
+              />
+              <Input
+                type="text"
+                placeholder="Email"
+                value={this.state.email}
+                error={checkEmail(this.state.email) ? '' : 'Invalid email'}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({email: target.value})}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={this.state.password}
+                error={passwordErrorMessage(this.state.password)}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({password: target.value})}
+              />
+              <Input
+                type="password"
+                placeholder="Repeat password"
+                value={this.state.passwordRepeat}
+                error={checkPasswords(this.state.password, this.state.passwordRepeat) ? '' : 'Passwords are not equal'}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({passwordRepeat: target.value})}
+              />
+              <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
+                <b>SIGN UP</b>
+              </Button>
+            </form>
+            <p>Do you already have account? <Link href="/sign_in"><a className="link">Sign in</a></Link></p>
+          </CenteredContent>
+        </AnimatePage>
       </div>
     )
   }

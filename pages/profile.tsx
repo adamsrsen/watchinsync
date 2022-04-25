@@ -12,6 +12,7 @@ import _ from 'lodash'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
+import AnimatePage from '../components/AnimatePage'
 
 interface Props {
   user: User
@@ -83,32 +84,34 @@ class Profile extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser}/>
-        <CenteredContent width={600}>
-          <form onSubmit={preventDefault(() => this.save())}>
-            <Input
-              type="text"
-              placeholder="Username"
-              value={this.state.username}
-              error={checkUsername(this.state.username) ? '' : 'Username is required field'}
-              onChange={({target}) => this.setState({username: target.value})}
-            />
-            <Input
-              type="text"
-              placeholder="Email"
-              value={this.state.email}
-              error={checkEmail(this.state.email) ? '' : 'Invalid email'}
-              forceError={this.state.forceError}
-              onChange={({target}) => this.setState({email: target.value})}
-            />
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
-              <b>SAVE</b>
+        <AnimatePage>
+          <CenteredContent width={600}>
+            <form onSubmit={preventDefault(() => this.save())}>
+              <Input
+                type="text"
+                placeholder="Username"
+                value={this.state.username}
+                error={checkUsername(this.state.username) ? '' : 'Username is required field'}
+                onChange={({target}) => this.setState({username: target.value})}
+              />
+              <Input
+                type="text"
+                placeholder="Email"
+                value={this.state.email}
+                error={checkEmail(this.state.email) ? '' : 'Invalid email'}
+                forceError={this.state.forceError}
+                onChange={({target}) => this.setState({email: target.value})}
+              />
+              <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
+                <b>SAVE</b>
+              </Button>
+            </form>
+            <Divider />
+            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/change_password">
+              <b>CHANGE PASSWORD</b>
             </Button>
-          </form>
-          <Divider />
-          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary} href="/change_password">
-            <b>CHANGE PASSWORD</b>
-          </Button>
-        </CenteredContent>
+          </CenteredContent>
+        </AnimatePage>
       </div>
     )
   }

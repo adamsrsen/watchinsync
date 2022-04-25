@@ -10,6 +10,7 @@ import Checkbox from '../../components/Checkbox'
 import axios from 'axios'
 import {preventDefault, renderLoading} from '../../lib/util'
 import {toast} from 'react-hot-toast'
+import AnimatePage from '../../components/AnimatePage'
 
 interface Props {
   user: User
@@ -53,17 +54,19 @@ class CreateRoom extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser}/>
-        <CenteredContent width={600}>
-          <form onSubmit={preventDefault(() => this.createRoom())}>
-            <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
-            <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
-              Public
-            </Checkbox>
-            <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
-              <b>CREATE ROOM</b>
-            </Button>
-          </form>
-        </CenteredContent>
+        <AnimatePage>
+          <CenteredContent width={600}>
+            <form onSubmit={preventDefault(() => this.createRoom())}>
+              <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
+              <Checkbox checked={this.state.public} onChange={() => this.setState({public: !this.state.public})}>
+                Public
+              </Checkbox>
+              <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.primary}>
+                <b>CREATE ROOM</b>
+              </Button>
+            </form>
+          </CenteredContent>
+        </AnimatePage>
       </div>
     )
   }

@@ -14,6 +14,7 @@ import Rooms from '../../../entity/Rooms'
 import Room from '../../../objects/Room'
 import {encode} from 'uuid-base64-ts'
 import {NextRouter, withRouter} from 'next/router'
+import AnimatePage from '../../../components/AnimatePage'
 
 interface Props {
   user: User
@@ -31,8 +32,8 @@ class RoomsPage extends Component<Props> {
 
     return (
       <List>
-        {this.props.pages ? this.props.rooms?.map((room) => (
-          <Item key={room.id}>
+        {this.props.pages ? this.props.rooms?.map((room, index) => (
+          <Item key={room.id} index={index}>
             <div className={styles.room}>
               <span>{room.name}</span>
               <Button size={ButtonSize.small} width={ButtonWidth.normal} color={ButtonColor.primary} href={`/room/${encodeURIComponent(room.id)}`}>
@@ -41,7 +42,7 @@ class RoomsPage extends Component<Props> {
             </div>
           </Item>
         )) : (
-          <Item>
+          <Item index={0}>
             <p className="center">
               There are no public rooms, so <Link href="/sign_up"><a className="link">sign up</a></Link> and create one
             </p>
@@ -60,11 +61,13 @@ class RoomsPage extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <Container>
-          <h2 className="title">Browse rooms</h2>
-          <Input type="text" placeholder="Search..." />
-          {this.renderRoomList()}
-        </Container>
+        <AnimatePage>
+          <Container>
+            <h2 className="title">Browse rooms</h2>
+            <Input type="text" placeholder="Search..." />
+            {this.renderRoomList()}
+          </Container>
+        </AnimatePage>
       </div>
     )
   }

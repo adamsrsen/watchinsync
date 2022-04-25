@@ -2,8 +2,10 @@ import '../styles/globals.scss'
 import {Toaster} from 'react-hot-toast'
 import {useEffect, useState} from 'react'
 import axios from 'axios'
+import {AnimatePresence} from 'framer-motion'
+import NextProgress from 'next-progress'
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, router }) {
   const [user, setUser] = useState()
   const [userLoaded, setLoaded] = useState(false)
 
@@ -16,7 +18,10 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <Component {...pageProps} user={user} setUser={setUser} userLoaded={userLoaded} />
+      <NextProgress color="#3ba55c" options={{ showSpinner: false }} />
+      <AnimatePresence exitBeforeEnter initial={false}>
+        <Component {...pageProps} user={user} setUser={setUser} userLoaded={userLoaded} key={router.route} />
+      </AnimatePresence>
       <Toaster
         reverseOrder
         toastOptions={{

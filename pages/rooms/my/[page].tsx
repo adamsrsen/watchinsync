@@ -15,6 +15,7 @@ import {withIronSessionSsr} from 'iron-session/next'
 import {sessionOptions} from '../../../lib/session'
 import getConnection from '../../../lib/db'
 import {encode} from 'uuid-base64-ts'
+import AnimatePage from '../../../components/AnimatePage'
 
 interface Props {
   user: User
@@ -38,27 +39,29 @@ export default class MyRooms extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <Container>
-          <h2 className="title">My rooms</h2>
-          <List>
-            {this.props.pages ? this.props.rooms?.map((room) => (
-              <Item key={room.id}>
-                <div className={styles.room}>
-                  <span>{room.name}</span>
-                  <Button size={ButtonSize.small} width={ButtonWidth.normal} color={ButtonColor.primary} href={`/room/${encodeURIComponent(room.id)}`}>
-                    <b>JOIN</b>
-                  </Button>
-                </div>
-              </Item>
-            )) : (
-              <Item>
-                <p className="center">
-                  You haven&#39;t joined any rooms yet, <Link href="/rooms/page/1"><a className="link">browse public rooms</a></Link> or <Link href="/room/create"><a className="link">create one</a></Link>
-                </p>
-              </Item>
-            )}
-          </List>
-        </Container>
+        <AnimatePage>
+          <Container>
+            <h2 className="title">My rooms</h2>
+            <List>
+              {this.props.pages ? this.props.rooms?.map((room, index) => (
+                <Item key={room.id} index={index}>
+                  <div className={styles.room}>
+                    <span>{room.name}</span>
+                    <Button size={ButtonSize.small} width={ButtonWidth.normal} color={ButtonColor.primary} href={`/room/${encodeURIComponent(room.id)}`}>
+                      <b>JOIN</b>
+                    </Button>
+                  </div>
+                </Item>
+              )) : (
+                <Item index={0}>
+                  <p className="center">
+                    You haven&#39;t joined any rooms yet, <Link href="/rooms/page/1"><a className="link">browse public rooms</a></Link> or <Link href="/room/create"><a className="link">create one</a></Link>
+                  </p>
+                </Item>
+              )}
+            </List>
+          </Container>
+        </AnimatePage>
       </div>
     )
   }
