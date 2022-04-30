@@ -12,7 +12,7 @@ import _ from 'lodash'
 import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
-import AnimatePage from '../components/AnimatePage'
+import FadeAnimation from '../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -84,7 +84,7 @@ class Profile extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser}/>
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent width={600}>
             <form onSubmit={preventDefault(() => this.save())}>
               <Input
@@ -111,7 +111,7 @@ class Profile extends Component<Props> {
               <b>CHANGE PASSWORD</b>
             </Button>
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

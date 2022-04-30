@@ -1,18 +1,29 @@
 @import "./styles/constants";
 
-.video {
+.user {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
 
-  .video-name {
+  .username {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 
     &:hover {
       color: $light-secondary;
+    }
+  }
+
+  .status {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: $grey;
+
+    &.online {
+      background-color: $color-primary;
     }
   }
 

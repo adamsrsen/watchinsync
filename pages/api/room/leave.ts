@@ -2,12 +2,12 @@ import {NextApiRequest, NextApiResponse} from 'next'
 import bodyParser from 'body-parser'
 import {promisify} from 'util'
 import getConnection from '../../../lib/db'
-import {sessionOptions} from '../../../lib/session'
-import {withIronSessionApiRoute} from 'iron-session/next'
-import Rooms from '../../../entity/Rooms'
 import {decodeRoomId} from '../../../lib/util'
+import {withIronSessionApiRoute} from 'iron-session/next'
+import {sessionOptions} from '../../../lib/session'
+import Roles from '../../../entity/Roles'
 
-const update = async function(req: NextApiRequest, res: NextApiResponse) {
+async function deleteRoom(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'POST') {
     await promisify(bodyParser.urlencoded())(req,res)
 
@@ -19,22 +19,15 @@ const update = async function(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).send('roomId has invalid format')
     }
 
-    if(!req.body?.name){
-      res.status(400).send('room name is not specified')
-      return
-    }
-
     const connection = await getConnection()
     try {
       await connection
         .createQueryBuilder()
-        .update<Rooms>('Rooms')
-        .set({
-          name: req.body.name,
-          public: req.body?.public
-        })
-        .where('id = :roomId AND owner.id = :userId', {roomId, userId: req.session?.user?.id})
+        .delete()
+        .from<Roles>('Roles')
+        .where('room.id = :roomId AND user.id = :userId', {roomId, userId: req.session?.user?.id})
         .execute()
+
       res.end()
     }
     catch(e) {
@@ -46,4 +39,4 @@ const update = async function(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withIronSessionApiRoute(update, sessionOptions)
+export default withIronSessionApiRoute(deleteRoom, sessionOptions)

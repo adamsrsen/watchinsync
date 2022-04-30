@@ -5,8 +5,10 @@ import getConnection from '../../../../lib/db'
 import Videos from '../../../../entity/Videos'
 import {decodeRoomId} from '../../../../lib/util'
 import {NextApiResponseSocketIO} from '../../../../objects/NextApiResponseSocketIO'
+import {sessionOptions, verifyPermission} from '../../../../lib/session'
+import {withIronSessionApiRoute} from 'iron-session/next'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponseSocketIO) {
+const removeFromPlaylist =  async function (req: NextApiRequest, res: NextApiResponseSocketIO) {
   if(req.method === 'POST') {
     await promisify(bodyParser.urlencoded())(req,res)
 
@@ -20,6 +22,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
     const connection = await getConnection()
     try {
+      if(!await verifyPermission(roomId, req.session?.user?.id, 'remove_video')) {
+        res.status(401).end()
+        return
+      }
+
       await connection
         .createQueryBuilder()
         .delete()
@@ -27,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         .where('id = :videoId AND room.id = :roomId', {videoId: req.body?.videoId, roomId})
         .execute()
 
-      res.socket?.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
+      res.socket?.server?.io.in(roomId).emit('update_playlist')
 
       res.end()
     }
@@ -39,3 +46,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
     res.status(405).end()
   }
 }
+
+export default withIronSessionApiRoute(removeFromPlaylist, sessionOptions)

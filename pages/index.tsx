@@ -6,7 +6,7 @@ import User from '../objects/User'
 import CenteredContent from '../components/CenteredContent'
 import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../components/Button'
 import Divider from '../components/Divider'
-import AnimatePage from '../components/AnimatePage'
+import FadeAnimation from '../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -24,7 +24,7 @@ export default class Home extends Component<Props> {
 
         <Header user={this.props.user} setUser={this.props.setUser} />
 
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent>
             {this.props.user ? (
               <>
@@ -50,7 +50,7 @@ export default class Home extends Component<Props> {
               </>
             )}
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

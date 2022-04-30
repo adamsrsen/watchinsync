@@ -6,6 +6,9 @@ import Videos, {VideoType} from '../../../../entity/Videos'
 import {decodeRoomId} from '../../../../lib/util'
 import {NextApiResponseSocketIO} from '../../../../objects/NextApiResponseSocketIO'
 import axios from 'axios'
+import {withIronSessionApiRoute} from 'iron-session/next'
+import {sessionOptions} from '../../../../lib/session'
+import {verifyPermission} from '../../../../lib/session'
 
 const getType = async (link) => {
   let match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?(?:youtube(-nocookie)?\.com|youtu.be)(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/)
@@ -20,7 +23,7 @@ const getType = async (link) => {
     return [VideoType.VIMEO, match[4], name]
   }
 
-  match = link.match(/^((?:https?:)?\/\/)?((?:www|m|clips)\.)?(twitch\.tv)\/(?:videos\/|\w+\/clip\/|)([\w\-]+)$/)
+  match = link.match(/^((?:https?:)?\/\/)?((?:www|m)\.)?(twitch\.tv)\/videos\/([\w\-]+)$/)
   if(match) {
     return [VideoType.TWITCH, match[4], match[4]]
   }
@@ -38,7 +41,7 @@ const getType = async (link) => {
   return []
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponseSocketIO) {
+const addToPlaylist = async function handler(req: NextApiRequest, res: NextApiResponseSocketIO) {
   if(req.method === 'POST') {
     await promisify(bodyParser.urlencoded())(req,res)
 
@@ -57,6 +60,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
     const connection = await getConnection()
     try {
+      if(!await verifyPermission(roomId, req.session?.user?.id, 'add_video')) {
+        res.status(401).end()
+        return
+      }
+
       await connection
         .createQueryBuilder()
         .insert()
@@ -73,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         })
         .execute()
 
-      res.socket?.server?.io.in(req.body?.roomId.toString()).emit('update_playlist')
+      res.socket?.server?.io.in(roomId).emit('update_playlist')
 
       res.end()
     }
@@ -85,3 +93,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
     res.status(405).end()
   }
 }
+
+export default withIronSessionApiRoute(addToPlaylist, sessionOptions)

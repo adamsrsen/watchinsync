@@ -40,19 +40,9 @@ export default class Modal extends Component<Props> {
           }}
         >
           <CenteredContent width={this.props.width} height="100vh">
-            <motion.div
-              className={styles['modal-content']}
-              variants={{
-                open: {
-                  scale: 1
-                },
-                close: {
-                  scale: 0
-                }
-              }}
-            >
+            <div className={styles['modal-content']}>
               {this.props.children}
-            </motion.div>
+            </div>
           </CenteredContent>
           <div className={styles.backdrop} onClick={this.props.close}/>
         </motion.div>

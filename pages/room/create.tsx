@@ -10,7 +10,7 @@ import Checkbox from '../../components/Checkbox'
 import axios from 'axios'
 import {preventDefault, renderLoading} from '../../lib/util'
 import {toast} from 'react-hot-toast'
-import AnimatePage from '../../components/AnimatePage'
+import FadeAnimation from '../../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -54,7 +54,7 @@ class CreateRoom extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser}/>
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent width={600}>
             <form onSubmit={preventDefault(() => this.createRoom())}>
               <Input type="text" placeholder="Name" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})} />
@@ -66,7 +66,7 @@ class CreateRoom extends Component<Props> {
               </Button>
             </form>
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

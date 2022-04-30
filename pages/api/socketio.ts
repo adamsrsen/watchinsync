@@ -12,6 +12,9 @@ import {decodeRoomId} from '../../lib/util'
 import {PlaybackState} from '../../components/players/Player'
 import getConnection from '../../lib/db'
 import Rooms from '../../entity/Rooms'
+import Users from '../../entity/Users'
+import permissions from './room/permissions'
+import {Connection} from 'typeorm'
 
 const FULL_PERMISSIONS: Permission = {
   play_pause: true,
@@ -49,12 +52,33 @@ const createPermissions = (permissions: Partial<Permissions>) => ({
   change_role: permissions.change_role
 })
 
+const updatePermissions = async (connection: Connection, roomId: string, permissions: Map<UserRole, Permission>) => {
+  const room = await connection
+    .getRepository<Rooms>('Rooms')
+    .createQueryBuilder('room')
+    .leftJoinAndSelect('room.admin_permissions', 'admin_permissions')
+    .leftJoinAndSelect('room.moderator_permissions', 'moderator_permissions')
+    .leftJoinAndSelect('room.member_permissions', 'member_permissions')
+    .where('room.id = :roomId', {roomId})
+    .getOne()
+  permissions.set(UserRole.OWNER, FULL_PERMISSIONS)
+  permissions.set(UserRole.ADMIN, createPermissions(room.admin_permissions))
+  permissions.set(UserRole.MODERATOR, createPermissions(room.moderator_permissions))
+  permissions.set(UserRole.MEMBER, createPermissions(room.member_permissions))
+}
+
+const broadcastUsers = (io, users: Map<string, UserData>) => {
+  io.emit('online_users', [...users.entries()].map(([socketId, user]) => ({id: user.id, socketId, username: user.username})))
+}
+
 class UserData {
+  id: number
   username: string
   role: UserRole
   permissions: Permission
 
-  constructor(username, role, permissions) {
+  constructor(id, username, role, permissions) {
+    this.id = id
     this.username = username
     this.role = role
     this.permissions = permissions
@@ -95,37 +119,44 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
         socket.join(roomId)
         io.in(roomId).emit('pause')
         if(!rooms.has(roomId)){
-          const room = await connection
-            .getRepository<Rooms>('Rooms')
-            .createQueryBuilder('room')
-            .leftJoinAndSelect('room.admin_permissions', 'admin_permissions')
-            .leftJoinAndSelect('room.moderator_permissions', 'moderator_permissions')
-            .leftJoinAndSelect('room.member_permissions', 'member_permissions')
-            .where('room.id = :roomId', {roomId})
-            .getOne()
           const permissions = new Map<UserRole, Permission>()
-          permissions.set(UserRole.OWNER, FULL_PERMISSIONS)
-          permissions.set(UserRole.ADMIN, createPermissions(room.admin_permissions))
-          permissions.set(UserRole.MODERATOR, createPermissions(room.moderator_permissions))
-          permissions.set(UserRole.MEMBER, createPermissions(room.member_permissions))
+          await updatePermissions(connection, roomId, permissions)
           rooms.set(roomId, new RoomVariables(permissions))
         }
         const userId = socket.request.session?.user?.id
         const room = rooms.get(roomId)
         if(!room.users.has(socket.id)){
-          const role = await connection
-            .getRepository<Roles>('Roles')
-            .createQueryBuilder('role')
-            .select('role.role')
-            .where('role.user.id = :userId', {userId})
-            .getOne()
-          if(role){
-            room.users.set(socket.id, new UserData(socket.request.session.user.username, role.role, room.permissions.get(role.role)))
+          if(userId){
+            let role = await connection
+              .getRepository<Roles>('Roles')
+              .createQueryBuilder('role')
+              .select('role.role')
+              .where('role.user.id = :userId AND role.room.id = :roomId', {userId, roomId})
+              .getOne()
+            if(!role){
+              role = new Roles()
+              role.role = UserRole.MEMBER
+              role.room = await connection
+                .getRepository<Rooms>('Rooms')
+                .createQueryBuilder('room')
+                .where('room.id = :roomId', {roomId})
+                .getOne()
+              role.user = await connection
+                .getRepository<Users>('Users')
+                .createQueryBuilder('user')
+                .where('user.id = :userId', {userId})
+                .getOne()
+              await connection
+                .getRepository<Roles>('Roles')
+                .save(role)
+            }
+            room.users.set(socket.id, new UserData(socket.request.session.user.id, socket.request.session.user.username, role.role, room.permissions.get(role.role)))
           }
           else {
-            room.users.set(socket.id, new UserData(`User #${Math.ceil(Math.random() * 1000)}`, UserRole.MEMBER, NO_PERMISSIONS))
+            room.users.set(socket.id, new UserData(null, `User #${Math.ceil(Math.random() * 1000)}`, UserRole.MEMBER, NO_PERMISSIONS))
           }
         }
+        broadcastUsers(io.in(roomId), room.users)
         const user = room.users.get(socket.id)
         socket.emit('permissions', user.role, user.permissions)
         if(user.role === UserRole.OWNER) {
@@ -170,6 +201,29 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
             io.in(roomId).emit('room_delete')
           }
         })
+        socket.on('permissions_update', async () => {
+          if(user.role === UserRole.OWNER) {
+            await updatePermissions(connection, roomId, room.permissions)
+            for (let [userId, user] of room.users.entries()) {
+              user.permissions = room.permissions.get(user.role)
+              io.in(userId).emit('permissions', user.role, user.permissions)
+            }
+          }
+        })
+        socket.on('permissions', async () => {
+          if(user.id){
+            const {role} = await connection
+              .getRepository<Roles>('Roles')
+              .createQueryBuilder('role')
+              .where('role.user.id = :userId AND role.room.id = :roomId', {userId: user.id, roomId: roomId})
+              .select('role.role')
+              .getOne()
+            user.role = role
+            user.permissions = room.permissions.get(role)
+            broadcastUsers(io.in(roomId), room.users)
+            socket.emit('permissions', user.role, user.permissions)
+          }
+        })
       })
 
       socket.on('disconnecting', () => {
@@ -177,6 +231,7 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
           if(rooms.has(roomId)) {
             const room = rooms.get(roomId)
             room.users.delete(socket.id)
+            broadcastUsers(io.in(roomId), room.users)
             if(room.users.size === 0){
               rooms.delete(roomId)
             }

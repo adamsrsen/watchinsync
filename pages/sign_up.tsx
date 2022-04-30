@@ -17,7 +17,7 @@ import {
   passwordErrorMessage
 } from '../lib/verify'
 import {preventDefault} from '../lib/util'
-import AnimatePage from '../components/AnimatePage'
+import FadeAnimation from '../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -78,7 +78,7 @@ class SignUp extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent width={600}>
             <form onSubmit={preventDefault(() => this.signUp())}>
               <Input
@@ -119,7 +119,7 @@ class SignUp extends Component<Props> {
             </form>
             <p>Do you already have account? <Link href="/sign_in"><a className="link">Sign in</a></Link></p>
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

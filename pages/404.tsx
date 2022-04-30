@@ -3,7 +3,7 @@ import Head from 'next/head'
 import CenteredContent from '../components/CenteredContent'
 import Header from '../components/Header'
 import User from '../objects/User'
-import AnimatePage from '../components/AnimatePage'
+import FadeAnimation from '../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -21,12 +21,12 @@ export default class Error404 extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent>
             <h2 className="title">404</h2>
             <p>Page not found</p>
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

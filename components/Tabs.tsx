@@ -1,5 +1,7 @@
 import {Component, ReactNode} from 'react'
 import styles from './Tabs.module.scss'
+import FadeAnimation from './FadeAnimation'
+import {AnimatePresence} from 'framer-motion'
 
 export class Tab {
   title: string
@@ -15,7 +17,11 @@ export class Tab {
   }
 
   renderContent() {
-    return this.content
+    return (
+      <FadeAnimation key={this.title}>
+        {this.content}
+      </FadeAnimation>
+    )
   }
 }
 
@@ -45,7 +51,9 @@ export default class Tabs extends Component {
           <div className={styles['ink-bar']} style={{width: `${tab_width}%`, left: `${tab_width * this.state.active}%`}} />
         </div>
         <div className={styles.content}>
-          {this.props.tabs[this.state.active].renderContent()}
+          <AnimatePresence exitBeforeEnter>
+            {this.props.tabs[this.state.active].renderContent()}
+          </AnimatePresence>
         </div>
       </div>
     )

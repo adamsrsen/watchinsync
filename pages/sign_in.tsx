@@ -10,7 +10,7 @@ import {toast} from 'react-hot-toast'
 import axios from 'axios'
 import {Router, withRouter} from 'next/router'
 import {preventDefault} from '../lib/util'
-import AnimatePage from '../components/AnimatePage'
+import FadeAnimation from '../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -54,7 +54,7 @@ class SignIn extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <AnimatePage>
+        <FadeAnimation>
           <CenteredContent width={600}>
             <form onSubmit={preventDefault(() => this.login())}>
               <Input
@@ -75,7 +75,7 @@ class SignIn extends Component<Props> {
             </form>
             <p>Don&#39;t you have account? <Link href="/sign_up"><a className="link">Sign up</a></Link></p>
           </CenteredContent>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

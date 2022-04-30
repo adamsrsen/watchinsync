@@ -14,7 +14,7 @@ import Rooms from '../../../entity/Rooms'
 import Room from '../../../objects/Room'
 import {encode} from 'uuid-base64-ts'
 import {NextRouter, withRouter} from 'next/router'
-import AnimatePage from '../../../components/AnimatePage'
+import FadeAnimation from '../../../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -61,13 +61,13 @@ class RoomsPage extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <AnimatePage>
+        <FadeAnimation>
           <Container>
             <h2 className="title">Browse rooms</h2>
             <Input type="text" placeholder="Search..." />
             {this.renderRoomList()}
           </Container>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

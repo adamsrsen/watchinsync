@@ -15,7 +15,7 @@ import {withIronSessionSsr} from 'iron-session/next'
 import {sessionOptions} from '../../../lib/session'
 import getConnection from '../../../lib/db'
 import {encode} from 'uuid-base64-ts'
-import AnimatePage from '../../../components/AnimatePage'
+import FadeAnimation from '../../../components/FadeAnimation'
 
 interface Props {
   user: User
@@ -39,7 +39,7 @@ export default class MyRooms extends Component<Props> {
         </Head>
 
         <Header user={this.props.user} setUser={this.props.setUser} />
-        <AnimatePage>
+        <FadeAnimation>
           <Container>
             <h2 className="title">My rooms</h2>
             <List>
@@ -61,7 +61,7 @@ export default class MyRooms extends Component<Props> {
               )}
             </List>
           </Container>
-        </AnimatePage>
+        </FadeAnimation>
       </div>
     )
   }

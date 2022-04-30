@@ -15,9 +15,12 @@ import Divider from './Divider'
 import Permission from '../objects/Permission'
 import {UserRole} from '../objects/UserRole'
 import {Socket} from 'socket.io-client'
+import User from '../objects/User'
+import {Router} from 'next/router'
 
 interface Props {
   room: Room
+  user?: User
   role: UserRole
   permissions: Permission
   permissionOptions: {
@@ -25,7 +28,9 @@ interface Props {
     key: string
   }[]
   permissionSettings: Permission[]
+  setPermissionSettings: Function
   socket: Socket
+  router: Router
 }
 
 export default class RoomHeader extends Component<Props> {
@@ -34,7 +39,6 @@ export default class RoomHeader extends Component<Props> {
     videoLink: string
     settingsOpened: boolean
     public: boolean
-    permissionSettings: Permission[]
   }
 
   constructor(props) {
@@ -44,8 +48,7 @@ export default class RoomHeader extends Component<Props> {
       roomName: this.props.room.name,
       videoLink: '',
       settingsOpened: false,
-      public: this.props.room.public,
-      permissionSettings: this.props.permissionSettings
+      public: this.props.room.public
     }
   }
 
@@ -95,7 +98,7 @@ export default class RoomHeader extends Component<Props> {
   }
 
   changePermissions(permission_level, permission) {
-    const permissions = this.state.permissionSettings
+    const permissions = this.props.permissionSettings
 
     if(permissions[permission_level][permission]) {
       for(let i = permission_level; i >= 0; i--){
@@ -108,15 +111,24 @@ export default class RoomHeader extends Component<Props> {
       }
     }
 
-    this.setState({permissionSettings: permissions})
+    this.props.setPermissionSettings(permissions)
+  }
+
+  getPermission(key) {
+    return 3 - this.props.permissionSettings.filter((permissions) => permissions[key]).length
   }
 
   updatePermissions() {
-    toast.promise(axios.post('/api/room/permissions/update', {roomId: this.props.room.id, permissions: this.state.permissionSettings}), {
+    let permissions = {}
+    for(let {key} of this.props?.permissionOptions) {
+      permissions[key] = this.getPermission(key)
+    }
+
+    toast.promise(axios.post('/api/room/permissions', {roomId: this.props.room.id, ...permissions}), {
       loading: 'Updating room permissions...',
       success: () => {
-        this.props.socket.emit('room_update')
-        return 'Room updated successfully'
+        this.props.socket.emit('permissions_update')
+        return 'Room permissions updated successfully'
       },
       error: 'Error occurred please try again later'
     })
@@ -124,7 +136,7 @@ export default class RoomHeader extends Component<Props> {
 
   permissionSettings() {
     return new Tab({
-      title: 'Permissions',
+      title: 'Permission',
       content: (
         <form onSubmit={preventDefault(() => this.updatePermissions())}>
           <table>
@@ -142,7 +154,7 @@ export default class RoomHeader extends Component<Props> {
                   <td>
                     {option.name}
                   </td>
-                  {this.props.permissionSettings.map((permissions, index) => (
+                  {this.props?.permissionSettings?.map((permissions, index) => (
                      <td key={index}>
                        <div className={styles.checkbox}>
                         <Checkbox onChange={() => {this.changePermissions(index, option.key)}} checked={permissions[option.key]} />
@@ -160,12 +172,33 @@ export default class RoomHeader extends Component<Props> {
       )
     })
   }
+  
+  leaveRoom() {
+    if(this.props?.user?.id) {
+      toast.promise(axios.post('/api/room/leave', {roomId: this.props.room.id}), {
+        loading: 'Leaving room...',
+        success: () => {
+          this.props.router.push('/')
+          return 'Left room successfully'
+        },
+        error: 'Error occurred please try again later'
+      })
+    }
+    else {
+      this.props.router.push('/')
+    }
+  }
 
   userSettings() {
     return new Tab({
       title: 'User',
       content: (
-        <p>User</p>
+        <>
+          <p className="center">Do you want to leave this room?</p>
+          <Button size={ButtonSize.small} width={ButtonWidth.fullwidth} color={ButtonColor.secondary} onClick={() => this.leaveRoom()}>
+            <b>LEAVE ROOM</b>
+          </Button>
+        </>
       )
     })
   }
@@ -187,7 +220,9 @@ export default class RoomHeader extends Component<Props> {
     if(this.props.role === UserRole.OWNER) {
       settings.push(this.roomSettings(),this.permissionSettings())
     }
-    settings.push(this.userSettings())
+    else {
+      settings.push(this.userSettings())
+    }
 
     return (
       <div className={styles.header}>
