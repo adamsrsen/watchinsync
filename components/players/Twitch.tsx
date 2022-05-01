@@ -46,7 +46,7 @@ export default class Twitch extends Player {
       // Listen to play event and send socket if it was user input
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.PLAY, () => {
-        if(this.playbackState === PlaybackState.paused) {
+        if(this.playbackState !== PlaybackState.playing) {
           this.props.socket.emit('play', this.player.getCurrentTime())
           setTimeout(() => {
             if(this.playbackState === PlaybackState.paused) {
@@ -58,13 +58,27 @@ export default class Twitch extends Player {
       // Listen to pause event and send socket if it was user input
       // @ts-ignore
       this.player.addEventListener(window.Twitch.Player.PAUSE, () => {
-        if(this.playbackState === PlaybackState.playing) {
-          this.props.socket.emit('pause', this.player.getCurrentTime())
-          setTimeout(() => {
-            if(this.playbackState === PlaybackState.playing) {
-              this.play()
-            }
-          }, 100)
+        if(this.playbackState !== PlaybackState.paused) {
+          if(this.player.getPlaybackStats().bufferSize < 1) {
+            this.props.socket.emit('buffer')
+            this.pause()
+            this.playbackState = PlaybackState.buffering
+            const buffering = setInterval(() => {
+              if(this.player.getPlaybackStats().bufferSize > 10){
+                this.props.socket.emit('ready')
+                this.playbackState = PlaybackState.paused
+                clearInterval(buffering)
+              }
+            }, 1000)
+          }
+          else {
+            this.props.socket.emit('pause', this.player.getCurrentTime())
+            setTimeout(() => {
+              if(this.playbackState === PlaybackState.playing) {
+                this.play()
+              }
+            }, 100)
+          }
         }
       })
       // Listen to seek event and send socket if it was user input

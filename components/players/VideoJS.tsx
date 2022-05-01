@@ -46,16 +46,23 @@ export default class VideoJS extends Player {
       })
       // Listen to play event and send socket if it was user input
       this.player.on('play', () => {
-        if (this.playbackState === PlaybackState.paused) {
+        if (this.playbackState !== PlaybackState.playing) {
           this.props.socket.emit('play', this.player.currentTime())
           this.pause()
         }
       })
       // Listen to pause event and send socket if it was user input
       this.player.on('pause', async () => {
-        if (this.playbackState === PlaybackState.playing) {
-          this.props.socket.emit('pause', this.player.currentTime())
-          await this.play()
+        if (this.playbackState !== PlaybackState.paused) {
+          if(Math.abs(this.player.bufferedEnd() - this.player.currentTime()) < 1) {
+            this.props.socket.emit('buffer')
+            this.pause()
+            this.playbackState = PlaybackState.buffering
+          }
+          else {
+            this.props.socket.emit('pause', this.player.currentTime())
+            await this.play()
+          }
         }
       })
       // Listen to seek event and send socket if it was user input
@@ -68,6 +75,12 @@ export default class VideoJS extends Player {
       // Listen to end event and play next
       this.player.on('ended', () => {
         this.ended()
+      })
+      this.player.on('progress', () => {
+        if (this.playbackState === PlaybackState.buffering && this.player.bufferedEnd() - this.player.currentTime() > 10) {
+          this.props.socket.emit('ready')
+          this.playbackState = PlaybackState.paused
+        }
       })
 
       this.initSockets()

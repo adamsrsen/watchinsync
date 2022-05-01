@@ -15,6 +15,7 @@ interface Props {
 export enum PlaybackState {
   playing,
   paused,
+  buffering
 }
 
 export default class Player extends Component<Props> {

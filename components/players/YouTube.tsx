@@ -55,11 +55,12 @@ export default class Youtube extends Player {
       videoId: this.props.link,
       events: {
         'onStateChange': (e) => {
+          // @ts-ignore
           switch(e.data) {
             // Listen to play event and send socket if it was user input
             // @ts-ignore
             case window.YT.PlayerState.PLAYING:
-              if(this.playbackState === PlaybackState.paused) {
+              if(this.playbackState !== PlaybackState.playing) {
                 this.props.socket.emit('play', this.player.getCurrentTime())
                 setTimeout(() => {
                   if(this.playbackState === PlaybackState.paused) {
@@ -71,7 +72,7 @@ export default class Youtube extends Player {
             // Listen to pause event and send socket if it was user input
             // @ts-ignore
             case window.YT.PlayerState.PAUSED:
-              if(this.playbackState === PlaybackState.playing) {
+              if(this.playbackState !== PlaybackState.paused) {
                 this.props.socket.emit('pause', this.player.getCurrentTime())
                 setTimeout(() => {
                   if(this.playbackState === PlaybackState.playing) {
@@ -80,6 +81,15 @@ export default class Youtube extends Player {
                 }, 100)
               }
               break
+            // @ts-ignore
+            case window.YT.PlayerState.BUFFERING:
+              this.props.socket.emit('buffer')
+              this.pause()
+              this.playbackState = PlaybackState.buffering
+            // @ts-ignore
+            case window.YT.PlayerState.CUED:
+              this.props.socket.emit('ready')
+              this.playbackState = PlaybackState.paused
             // Listen to end event and play next
             // @ts-ignore
             case window.YT.PlayerState.ENDED:

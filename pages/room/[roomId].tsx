@@ -25,6 +25,7 @@ import UserList from '../../components/UserList'
 import Users from '../../entity/Users'
 import Roles from '../../entity/Roles'
 import User from '../../objects/User'
+import {toast} from 'react-hot-toast'
 
 const players = {
   '': Player,
@@ -164,6 +165,7 @@ class RoomPage extends Component<Props> {
     this.socket.on('permissions_update', () => {
       this.socket.emit('permissions')
     })
+    this.socket.on('notification', (message, options) => toast(message, options))
     this.socket.emit('join', this.props.room.id)
 
     this.player = createRef()

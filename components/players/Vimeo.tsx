@@ -48,7 +48,7 @@ export default class Vimeo extends Player {
 
     // Listen to play event and send socket if it was user input
     this.player.on('play', (data) => {
-      if(this.playbackState === PlaybackState.paused) {
+      if(this.playbackState !== PlaybackState.playing) {
         this.props.socket.emit('play', data?.seconds)
         setTimeout(async () => {
           if(this.playbackState === PlaybackState.paused) {
@@ -59,7 +59,7 @@ export default class Vimeo extends Player {
     })
     // Listen to pause event and send socket if it was user input
     this.player.on('pause', (data) => {
-      if(this.playbackState === PlaybackState.playing) {
+      if(this.playbackState !== PlaybackState.paused) {
         this.props.socket.emit('pause', data?.seconds)
         setTimeout(async () => {
           if(this.playbackState === PlaybackState.playing) {
@@ -80,6 +80,15 @@ export default class Vimeo extends Player {
       if(playbackRate !== this.playbackRate) {
         this.props.socket.emit('playback_rate', playbackRate)
       }
+    })
+    this.player.on('bufferstart', async () => {
+      this.props.socket.emit('buffer')
+      await this.pause()
+      this.playbackState = PlaybackState.buffering
+    })
+    this.player.on('bufferend', () => {
+      this.props.socket.emit('ready')
+      this.playbackState = PlaybackState.paused
     })
     // Listen to end event and play next
     this.player.on('ended', () => {

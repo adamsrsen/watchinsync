@@ -76,6 +76,7 @@ class UserData {
   username: string
   role: UserRole
   permissions: Permission
+  ready: boolean = false
 
   constructor(id, username, role, permissions) {
     this.id = id
@@ -169,6 +170,10 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
 
         socket.on('play', (time) => {
           if(user.permissions.play_pause){
+            for(const user of room.users.values()){
+              if(!user.ready) return socket.emit('notification', 'Some users are still loading the video')
+            }
+            io.in(roomId).emit('notification', `${user.username} started video`)
             io.in(roomId).emit('seek', time)
             io.in(roomId).emit('play')
             room.playbackState = PlaybackState.playing
@@ -176,6 +181,7 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
         })
         socket.on('pause', (time) => {
           if(user.permissions.play_pause){
+            io.in(roomId).emit('notification', `${user.username} paused video`)
             io.in(roomId).emit('seek', time)
             io.in(roomId).emit('pause')
             room.playbackState = PlaybackState.paused
@@ -186,8 +192,21 @@ export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
             io.in(roomId).emit('seek', time)
           }
         })
+        socket.on('buffer', () => {
+          user.ready = false
+          io.in(roomId).emit('notification', `${user.username} is buffering the video`)
+          io.in(roomId).emit('pause')
+        })
+        socket.on('ready', () => {
+          user.ready = true
+          for(const user of room.users.values()){
+            if(!user.ready) return
+          }
+          io.in(roomId).emit('play')
+        })
         socket.on('playback_rate', (playbackRate) => {
           if(user.permissions.playback_speed){
+            io.in(roomId).emit('notification', `${user.username} set playback speed to ${playbackRate}`)
             io.in(roomId).emit('playback_rate', playbackRate)
           }
         })
