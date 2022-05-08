@@ -239,7 +239,7 @@ export default class RoomHeader extends Component<Props> {
         </div>
         {this.props.permissions?.add_video && (
           <form className={[styles['header-group'], styles['header-input']].join(' ')} onSubmit={preventDefault(() => this.addVideo())}>
-            <input placeholder="Videos url (https://example.com/video.mp4)" value={this.state.videoLink} onChange={(e) => this.setState({videoLink: e.target.value})} />
+            <input placeholder="Video url (https://example.com/video.mp4)" value={this.state.videoLink} onChange={(e) => this.setState({videoLink: e.target.value})} />
             <button>Add</button>
           </form>
         )}

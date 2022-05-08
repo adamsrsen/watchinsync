@@ -69,7 +69,7 @@ export default class Playlist extends Component<Props> {
               </div>
               <div>
                 <Dropdown options={options.map((option) => option(video))}>
-                  <Image src="/more.svg" width={24} height={24} />
+                  <Image src="/more.svg" width={24} height={24} alt="Options" />
                 </Dropdown>
               </div>
             </div>

@@ -66,7 +66,7 @@ export default class UserList extends Component<Props> {
               {this.props.permissions.change_role && user.id && user.id !== this.props.user.id && user.role > this.props.role && (
                 <div>
                   <Dropdown options={options.map((option) => option(user))}>
-                    <Image src="/more.svg" width={24} height={24} />
+                    <Image src="/more.svg" width={24} height={24} alt="options" />
                   </Dropdown>
                 </div>
               )}

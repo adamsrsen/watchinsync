@@ -76,7 +76,7 @@ export default withRouter(MyRooms)
 
 
 export const getServerSideProps = withIronSessionSsr(async ({params, req, res}) => {
-  const ROOMS_PER_PAGE = 1
+  const ROOMS_PER_PAGE = 10
   const userId = req.session?.user?.id
   if(!userId) {
     return {

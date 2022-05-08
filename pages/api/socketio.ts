@@ -98,7 +98,7 @@ class RoomVariables {
 
 export const rooms = new Map<string, RoomVariables>()
 
-export default async (req: NextApiRequest, res: NextApiResponseSocketIO) => {
+export default async function socketio(req: NextApiRequest, res: NextApiResponseSocketIO) {
   if (!res.socket.server.io) {
     const io = new Server(res.socket.server as http.Server, {
       path: '/api/socketio',

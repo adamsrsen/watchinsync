@@ -26,10 +26,6 @@ interface Props {
 
 class RoomsPage extends Component<Props> {
   renderRoomList() {
-    if(this.props.router.isFallback) {
-      return <h2 className="text-center">Loading...</h2>
-    }
-
     return (
       <List>
         {this.props.pages ? this.props.rooms?.map((room, index) => (
@@ -77,20 +73,7 @@ class RoomsPage extends Component<Props> {
 
 export default withRouter(RoomsPage)
 
-export async function getStaticPaths() {
-  return {
-    paths: [
-      {
-        params: {
-          page: ':page'
-        }
-      }
-    ],
-    fallback: true
-  }
-}
-
-export async function getStaticProps({params}) {
+export async function getServerSideProps({params}) {
   const ROOMS_PER_PAGE = 10
   const {page} = params
   if(parseInt(page as string) < 1) {
@@ -104,7 +87,6 @@ export async function getStaticProps({params}) {
     .getRepository<Rooms>('Rooms')
     .createQueryBuilder('room')
     .select(['room.id', 'room.name'])
-    .where('room.public = :public', {public: true})
     .orderBy('room.name', 'ASC')
     .limit(ROOMS_PER_PAGE)
     .offset((parseInt(page as string) - 1) * ROOMS_PER_PAGE)

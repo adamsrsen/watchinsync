@@ -6,8 +6,8 @@ import styles from './Header.module.scss'
 import axios from 'axios'
 
 interface Props {
-  user: User
-  setUser: Function
+  user?: User
+  setUser?: Function
 }
 
 export default class Header extends Component<Props> {
@@ -29,7 +29,7 @@ export default class Header extends Component<Props> {
           </a>
         </Link>
         <div className={styles['header-group']}>
-          {this.props.user ? (
+          {this.props?.user ? (
             <>
               <Link href="/profile">
                 <a className={[styles['header-link'], styles['header-text']].join(' ')}>
