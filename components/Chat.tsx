@@ -39,7 +39,7 @@ export default class Chat extends Component<Props> {
           <FunctionContext.Consumer>
             {({ scrollTo }) => (
               <StateContext.Consumer>
-                {({ atStart, animating }) => (atStart && !animating && (() => {this.props.loadMessages();scrollTo(20)})())}
+                {({ atStart, animating }) => (atStart && !animating && (() => this.props.loadMessages())())}
               </StateContext.Consumer>
             )}
           </FunctionContext.Consumer>

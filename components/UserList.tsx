@@ -56,14 +56,14 @@ export default class UserList extends Component<Props> {
     }
     return (
       <List>
-        {this.props.userList.map((user, index) => (
+        {this.props?.userList?.map((user, index) => (
           <Item key={index} index={index}>
             <div className={styles.user}>
               <div className={styles['no-overflow']}>
                 <div className={`${styles.status}${user.online ? ` ${styles.online}` : ''}`}></div>
                 <span className={styles.username}>{user.username}</span>
               </div>
-              {this.props.permissions.change_role && user.id && user.id !== this.props.user.id && user.role > this.props.role && (
+              {this.props?.permissions?.change_role && user.id && user.id !== this.props.user.id && user.role > this.props.role && (
                 <div>
                   <Dropdown options={options.map((option) => option(user))}>
                     <Image src="/more.svg" width={24} height={24} alt="options" />

@@ -37,15 +37,6 @@ export default class Facebook extends Player {
         this.player.subscribe('finishedPlaying', () => {
           this.ended()
         })
-        this.player.subscribe('startedBuffering', () => {
-          this.props.socket.emit('buffer')
-          this.pause()
-          this.playbackState = PlaybackState.buffering
-        })
-        this.player.subscribe('finishedBuffering', () => {
-          this.props.socket.emit('ready')
-          this.playbackState = PlaybackState.paused
-        })
 
         // Detecting seek and sending socket
         clearInterval(this.interval)

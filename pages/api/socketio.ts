@@ -76,7 +76,7 @@ class UserData {
   username: string
   role: UserRole
   permissions: Permission
-  ready: boolean = false
+  ready: boolean = true
 
   constructor(id, username, role, permissions) {
     this.id = id

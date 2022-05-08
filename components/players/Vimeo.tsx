@@ -81,15 +81,6 @@ export default class Vimeo extends Player {
         this.props.socket.emit('playback_rate', playbackRate)
       }
     })
-    this.player.on('bufferstart', async () => {
-      this.props.socket.emit('buffer')
-      await this.pause()
-      this.playbackState = PlaybackState.buffering
-    })
-    this.player.on('bufferend', () => {
-      this.props.socket.emit('ready')
-      this.playbackState = PlaybackState.paused
-    })
     // Listen to end event and play next
     this.player.on('ended', () => {
       this.ended()

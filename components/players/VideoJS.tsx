@@ -94,7 +94,7 @@ export default class VideoJS extends Player {
   render() {
     return (
       <div data-vjs-player>
-        <video ref={this.videoRef} className="video-js vjs-big-play-centered" controls={true}>
+        <video ref={this.videoRef} className="video-js vjs-big-play-centered" controls={true} preload="auto">
           <source src={this.props.link}/>
         </video>
       </div>

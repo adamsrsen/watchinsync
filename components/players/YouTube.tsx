@@ -81,15 +81,6 @@ export default class Youtube extends Player {
                 }, 100)
               }
               break
-            // @ts-ignore
-            case window.YT.PlayerState.BUFFERING:
-              this.props.socket.emit('buffer')
-              this.pause()
-              this.playbackState = PlaybackState.buffering
-            // @ts-ignore
-            case window.YT.PlayerState.CUED:
-              this.props.socket.emit('ready')
-              this.playbackState = PlaybackState.paused
             // Listen to end event and play next
             // @ts-ignore
             case window.YT.PlayerState.ENDED:
