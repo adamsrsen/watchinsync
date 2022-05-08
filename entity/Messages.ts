@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp} from 'typeorm'
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
 import Users from './Users'
 import Rooms from './Rooms'
 
@@ -10,8 +10,8 @@ export default class Messages {
   @Column()
   text: string
 
-  @Column({type: 'timestamp'})
-  timestamp: Timestamp
+  @Column({type: 'timestamptz'})
+  timestamp: Date
 
   @ManyToOne(() => Users)
   user: Partial<Users>

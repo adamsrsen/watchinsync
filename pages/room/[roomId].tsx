@@ -26,6 +26,8 @@ import Users from '../../entity/Users'
 import Roles from '../../entity/Roles'
 import User from '../../objects/User'
 import {toast} from 'react-hot-toast'
+import user from '../api/user'
+import Message from '../../objects/Message'
 
 const players = {
   '': Player,
@@ -56,6 +58,7 @@ class RoomPage extends Component<Props> {
       role?: UserRole
       online: false
     }[]
+    messages: Message[]
     role?: UserRole
     permissions?: Permission
     permissionOptions?: {
@@ -66,6 +69,8 @@ class RoomPage extends Component<Props> {
   }
   socket: Socket
   player: RefObject<any>
+  loadedAllMessages: boolean
+  loadingMessages: boolean
 
   constructor(props) {
     super(props)
@@ -73,7 +78,8 @@ class RoomPage extends Component<Props> {
     this.state = {
       room: this.props.room,
       playlist: [],
-      users: this.props.users
+      users: this.props.users,
+      messages: []
     }
 
     this.updatePlaylist()
@@ -106,7 +112,11 @@ class RoomPage extends Component<Props> {
       })
       this.setState({users: this.state.users, userList: userList})
     })
-    this.socket.on('permissions', (role, permissions) => {
+    this.socket.on('permissions', (role: UserRole, permissions: Permission) => {
+      if(permissions.chat) {
+        this.socket.on('message', (message) => this.insertMessages([message], this.state.messages))
+        axios.get(`/api/room/messages?roomId=${encodeURIComponent(this.props.room.id)}`).then(({data}) => this.insertMessages(data, []))
+      }
       this.setState({role: role, permissions: permissions})
     })
     this.socket.on('permission_settings', (permissions) => {
@@ -177,6 +187,46 @@ class RoomPage extends Component<Props> {
     }).catch((e) => {})
   }
 
+  insertMessages(data, messages, reverse = false) {
+    if(data.length === 0) {
+      this.loadedAllMessages = true
+      this.loadingMessages = false
+      return
+    }
+    let lastMessage = messages[messages.length - 1]
+    if(reverse) {
+      messages.reverse()
+    }
+    else {
+      data.reverse()
+    }
+    for(const message of data) {
+      if(message.user.id !== lastMessage?.user?.id) {
+        messages.push({user: message.user, texts: []})
+      }
+      if(reverse) {
+        messages[messages.length - 1].texts.splice(0,0,{text: message.text, date: new Date(message.timestamp)})
+      }
+      else {
+        messages[messages.length - 1].texts.push({text: message.text, date: new Date(message.timestamp)})
+      }
+
+      lastMessage = message
+    }
+    if(reverse){
+      messages.reverse()
+    }
+    this.setState({messages: messages})
+    this.loadingMessages = false
+  }
+
+  loadMessages() {
+    if(!this.loadedAllMessages && !this.loadingMessages){
+      this.loadingMessages = true
+      axios.get(`/api/room/messages?roomId=${encodeURIComponent(this.props.room.id)}&offset=${this.state.messages.reduce((partialSum, message) => partialSum + message.texts.length, 0)}`).then(({data}) => this.insertMessages(data, this.state.messages, true))
+    }
+  }
+
   componentWillUnmount() {
     this.socket.disconnect()
   }
@@ -192,7 +242,7 @@ class RoomPage extends Component<Props> {
     if(this.state?.permissions?.chat) {
       tabs.push(new Tab({
         title: 'Chat',
-        content: <Chat room={this.state.room} />
+        content: <Chat room={this.state.room} messages={this.state.messages} loadMessages={() => this.loadMessages()} />
       }))
     }
     tabs.push(new Tab({
