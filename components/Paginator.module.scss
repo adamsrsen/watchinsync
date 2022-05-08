@@ -1,0 +1,15 @@
+@import "./styles/constants";
+
+.paginator {
+  display: flex;
+  justify-content: center;
+  font-size: 2rem;
+
+  & > * {
+    margin: 1rem;
+  }
+
+  .active {
+    color: $color-primary;
+  }
+}

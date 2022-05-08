@@ -8,13 +8,13 @@ import List from '../../../components/List'
 import Item from '../../../components/Item'
 import Button, {ButtonColor, ButtonSize, ButtonWidth} from '../../../components/Button'
 import styles from '../../../styles/Rooms.module.scss'
-import Input from '../../../components/Input'
 import getConnection from '../../../lib/db'
 import Rooms from '../../../entity/Rooms'
 import Room from '../../../objects/Room'
 import {encode} from 'uuid-base64-ts'
 import {NextRouter, withRouter} from 'next/router'
 import FadeAnimation from '../../../components/FadeAnimation'
+import Paginator from '../../../components/Paginator'
 
 interface Props {
   user: User
@@ -53,6 +53,8 @@ class RoomsPage extends Component<Props> {
   }
 
   render() {
+    const page = parseInt(this.props.router.query.page as string)
+
     return (
       <div>
         <Head>
@@ -64,8 +66,8 @@ class RoomsPage extends Component<Props> {
         <FadeAnimation>
           <Container>
             <h2 className="title">Browse rooms</h2>
-            <Input type="text" placeholder="Search..." />
             {this.renderRoomList()}
+            <Paginator page={page} totalPages={this.props.pages} baseUrl="/rooms/page" />
           </Container>
         </FadeAnimation>
       </div>
@@ -89,7 +91,13 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({params}) {
+  const ROOMS_PER_PAGE = 10
   const {page} = params
+  if(parseInt(page as string) < 1) {
+    return {
+      notFound: true
+    }
+  }
 
   const connection = await getConnection()
   const rooms = await connection
@@ -98,15 +106,21 @@ export async function getStaticProps({params}) {
     .select(['room.id', 'room.name'])
     .where('room.public = :public', {public: true})
     .orderBy('room.name', 'ASC')
-    .limit(25)
-    .offset((parseInt(page) - 1) * 25)
+    .limit(ROOMS_PER_PAGE)
+    .offset((parseInt(page as string) - 1) * ROOMS_PER_PAGE)
     .getMany()
-  const roomCount = await connection
+  const pageCount = Math.ceil((await connection
     .getRepository<Rooms>('Rooms')
     .createQueryBuilder('room')
     .select(['room.id', 'room.name'])
     .where('room.public = :public', {public: true})
-    .getCount()
+    .getCount()) / ROOMS_PER_PAGE)
+
+  if(parseInt(page as string) > pageCount && (pageCount > 0 || parseInt(page as string) > 1)) {
+    return {
+      notFound: true
+    }
+  }
 
   return {
     props: {
@@ -114,7 +128,7 @@ export async function getStaticProps({params}) {
         id: encode(room.id),
         name: room.name
       })),
-      pages: Math.ceil(roomCount / 25)
+      pages: pageCount
     }
   }
 }

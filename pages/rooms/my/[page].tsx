@@ -16,6 +16,8 @@ import {sessionOptions} from '../../../lib/session'
 import getConnection from '../../../lib/db'
 import {encode} from 'uuid-base64-ts'
 import FadeAnimation from '../../../components/FadeAnimation'
+import Paginator from '../../../components/Paginator'
+import {Router, withRouter} from 'next/router'
 
 interface Props {
   user: User
@@ -23,13 +25,15 @@ interface Props {
   userLoaded: boolean
   rooms: Room[]
   pages: number
+  router: Router
 }
 
-export default class MyRooms extends Component<Props> {
+class MyRooms extends Component<Props> {
   render() {
     if(!this.props.userLoaded) {
       return renderLoading()
     }
+    const page = parseInt(this.props.router.query.page as string)
 
     return (
       <div>
@@ -60,6 +64,7 @@ export default class MyRooms extends Component<Props> {
                 </Item>
               )}
             </List>
+            <Paginator page={page} totalPages={this.props.pages} baseUrl="/rooms/my" />
           </Container>
         </FadeAnimation>
       </div>
@@ -67,8 +72,11 @@ export default class MyRooms extends Component<Props> {
   }
 }
 
+export default withRouter(MyRooms)
+
 
 export const getServerSideProps = withIronSessionSsr(async ({params, req, res}) => {
+  const ROOMS_PER_PAGE = 1
   const userId = req.session?.user?.id
   if(!userId) {
     return {
@@ -76,6 +84,12 @@ export const getServerSideProps = withIronSessionSsr(async ({params, req, res}) 
         destination: '/sign_in',
         permanent: false,
       },
+    }
+  }
+  const {page} = params
+  if(parseInt(page as string) < 1) {
+    return {
+      notFound: true
     }
   }
 
@@ -86,15 +100,22 @@ export const getServerSideProps = withIronSessionSsr(async ({params, req, res}) 
     .select(['room.id', 'room.name'])
     .innerJoin('room.roles', 'role', 'role.user.id = :userId', {userId})
     .orderBy('role.role', 'ASC')
-    .limit(25)
-    .offset((parseInt(params.page as string) - 1) * 25)
+    .orderBy('room.name', 'ASC')
+    .limit(ROOMS_PER_PAGE)
+    .offset((parseInt(page as string) - 1) * ROOMS_PER_PAGE)
     .getMany()
-  const roomCount = await connection
+  const pageCount = Math.ceil((await connection
     .getRepository<Rooms>('Rooms')
     .createQueryBuilder('room')
     .innerJoin('room.roles', 'role', 'role.user.id = :userId', {userId})
     .orderBy('role.role', 'ASC')
-    .getCount()
+    .getCount()) / ROOMS_PER_PAGE)
+
+  if(parseInt(page as string) > pageCount && (pageCount > 0 || parseInt(page as string) > 1)) {
+    return {
+      notFound: true
+    }
+  }
 
   return {
     props: {
@@ -102,7 +123,7 @@ export const getServerSideProps = withIronSessionSsr(async ({params, req, res}) 
         id: encode(room.id),
         name: room.name
       })),
-      pages: Math.ceil(roomCount / 25)
+      pages: pageCount
     }
   }
 }, sessionOptions)
